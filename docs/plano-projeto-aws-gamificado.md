@@ -1,302 +1,292 @@
-# Plano Solo Founder — Plataforma Gamificada AWS (Terraform + Incidente + Invasão)
+# Plano do Lab Pessoal — Kubernetes + Chaos Engineering + Cybersecurity (Local, Baixo Custo)
 
-> Versão refeita para execução por **1 pessoa** (você) com apoio de IA.
-> Objetivo: lançar rápido, validar com clientes e só depois escalar complexidade.
-
-## 1) Tese do produto (foco realista)
-
-Você vai construir uma plataforma que cria ambientes AWS efêmeros via Terraform para treino técnico gamificado em 2 modos:
-
-- **Modo Incidente:** o jogador precisa restaurar serviço, aumentar resiliência e automação.
-- **Modo Invasão:** o jogador precisa bloquear cadeia de ataque e evitar vazamento de dados.
-
-### Regra principal para solo founder
-Se uma feature não ajudar a:
-1) vender piloto,
-2) provar resultado em segurança/confiabilidade,
-3) reduzir custo operacional,
-elas **não entra no MVP**.
+> **Contexto:** este plano é para **lab pessoal de aprendizado**, não para produto.
+> **Objetivo:** aprender Kubernetes de verdade, com dados sintéticos, falhas reais (chaos) e ataques cibernéticos controlados.
+> **Restrição:** rodar em máquina simples com **16GB RAM** e custo próximo de zero.
 
 ---
 
-## 2) Estratégia de execução solo (essencial)
+## 1) Missão do lab
 
-## 2.1 Princípios de sobrevivência
+Você vai montar um mini-ambiente de produção em Kubernetes, com serviços, banco e observabilidade, e depois submeter esse ambiente a:
+- **falhas operacionais propositalmente injetadas** (chaos engineering);
+- **ataques cibernéticos simulados e controlados** (red team de laboratório).
 
-1. **Um único cloud provider no início:** AWS apenas.
-2. **Sem multi-tenant complexo no MVP:** 1 cliente por vez (tenant “semi-isolado”).
-3. **Sem EKS no início:** usar ECS Fargate + Lambda para reduzir operação.
-4. **Sem microserviços demais:** monolito modular no backend.
-5. **Sem customização profunda na fase inicial:** catálogo pequeno de cenários padrão.
-6. **Automatizar destruição de ambiente sempre:** custo e risco sob controle.
-
-## 2.2 Meta de 90 dias
-
-Entregar um produto funcional com:
-- Provisionamento de laboratório em < 20 minutos.
-- 3 cenários de Incidente + 3 cenários de Invasão.
-- Score em tempo real.
-- Relatório final com evidências.
-- Painel simples para operar sessões manualmente.
+A regra é simples: cada falha/ataque precisa terminar com:
+1. detecção (como percebeu),
+2. contenção (como parou o impacto),
+3. correção (como evitou recorrência),
+4. evidência (logs, métricas, diff em manifest, runbook).
 
 ---
 
-## 3) Stack enxuta recomendada (para 1 pessoa)
+## 2) Objetivos de aprendizagem (K8s + Resiliência + Segurança)
 
-## 3.1 Escolha final
+Ao concluir, você deve dominar na prática:
 
-- **Infra:** Terraform.
-- **Backend/API + Orquestração leve:** Python (FastAPI).
-- **Frontend:** Next.js (TypeScript).
-- **Banco principal:** PostgreSQL (RDS ou Supabase no início, se preferir reduzir AWS).
-- **Fila/eventos:** SQS + EventBridge (apenas o necessário).
-- **Estado de sessão em tempo real:** Redis (ElastiCache) ou Postgres com polling no MVP.
-- **Auth:** Auth0/Clerk/Cognito (não construir auth do zero).
-- **Observabilidade:** CloudWatch + CloudTrail + GuardDuty + Security Hub.
+### Kubernetes
+- Deployments, StatefulSets, Services, Ingress;
+- ConfigMaps, Secrets, Requests/Limits, HPA;
+- probes (liveness/readiness/startup);
+- RBAC, ServiceAccounts, NetworkPolicies;
+- troubleshooting via `kubectl logs`, `describe`, `events`, `top`, `exec`.
 
-## 3.2 Por que esse stack para solo founder
+### Resiliência
+- comportamento sob perda de pod, latência, indisponibilidade e erro de configuração;
+- rollback e hardening de config;
+- melhoria de MTTD/MTTR com observabilidade.
 
-- Python acelera automação de segurança e scripting de cenários.
-- FastAPI é simples e rápido para CRUD + jobs.
-- Next.js entrega interface decente sem time de frontend.
-- Terraform mantém tudo reproduzível e vendável para cliente enterprise.
-
----
-
-## 4) Arquitetura MVP (simples e vendável)
-
-## 4.1 Componentes mínimos
-
-1. **Web App (Next.js):** login, criar sessão, iniciar cenário, ver score/eventos.
-2. **API (FastAPI):** usuários, sessões, objetivos, placar, relatório.
-3. **Scenario Runner (Python):** executa scripts de incidente/invasão.
-4. **Terraform Runner:** sobe e derruba laboratórios efêmeros.
-5. **Scoring Engine (no próprio backend):** calcula pontos por evidência.
-
-## 4.2 Fluxo de execução
-
-1. Você seleciona cenário no painel admin.
-2. API dispara Terraform para criar ambiente da sessão.
-3. Runner agenda eventos (incidentes ou ataques) com janelas de tempo.
-4. Jogador atua no ambiente AWS sandbox.
-5. Sistema coleta sinais (logs/eventos/alertas) e atualiza score.
-6. Ao fim, gera relatório e destrói ambiente automaticamente.
+### Segurança
+- hardening de containers (não-root, capabilities mínimas, FS read-only);
+- varredura de vulnerabilidades em imagens;
+- segmentação por namespace e política default deny;
+- mitigação de vazamento de segredos e permissões excessivas.
 
 ---
 
-## 5) Modos de jogo (MVP concreto)
+## 3) Arquitetura do lab (feita para 16GB)
 
-## 5.1 Modo Incidente — 3 cenários iniciais
+## 3.1 Plataforma
+- **Cluster local:** `k3d` (recomendado) com 1 control-plane + 2 workers.
+- **SO host:** Linux, macOS ou WSL2.
+- **Container runtime:** Docker.
 
-1. **Falha de serviço web:** task ECS parada; objetivo = restaurar saúde e uptime.
-2. **Erro de segurança de rede:** regra SG bloqueando dependência crítica; objetivo = corrigir conectividade com mínimo risco.
-3. **Saturação de recurso:** carga artificial em API; objetivo = auto-scaling + alerta útil.
+## 3.2 Aplicação sintética (domínio: e-commerce)
 
-### Critérios de pontuação (Incidente)
-- Tempo de detecção.
-- Tempo de recuperação.
-- Qualidade da correção (evitou gambiarra insegura?).
-- Se implementou automação/runbook reutilizável.
+Serviços em `lab-app`:
+1. `web-frontend` (UI simples)
+2. `api-gateway`
+3. `orders-service`
+4. `catalog-service`
+5. `payments-mock`
+6. `postgres` (stateful)
+7. `redis`
 
-## 5.2 Modo Invasão — 3 cenários iniciais
+Suporte:
+- `synthetic-seeder` para gerar dados falsos diariamente;
+- `job-traffic-generator` para gerar carga artificial (RPS baixo).
 
-1. **IAM excessivo:** política permissiva explorável; objetivo = conter escalonamento.
-2. **S3 inseguro:** bucket com política ruim; objetivo = impedir leitura indevida/exfiltração.
-3. **Secret exposto em app de laboratório:** objetivo = rotação + mitigação + bloqueio de uso.
-
-### Critérios de pontuação (Invasão)
-- Tempo até contenção.
-- Etapas da kill chain interrompidas.
-- Dados sensíveis preservados.
-- Evidências geradas (forense mínima).
-
----
-
-## 6) Modelo de dados mínimo (sem overengineering)
-
-Tabelas principais:
-- `users`
-- `organizations`
-- `sessions`
-- `scenarios`
-- `objectives`
-- `signals`
-- `score_events`
-- `session_reports`
-
-Armazenamento:
-- **Postgres:** entidades transacionais.
-- **S3:** artefatos de sessão, logs e relatórios em JSON/PDF.
+## 3.3 Observabilidade e segurança
+- `lab-observability`: Prometheus + Grafana + Loki + Promtail;
+- `lab-chaos`: LitmusChaos;
+- `lab-security`: Trivy + Kyverno;
+- `lab-redteam`: pods/scripts de ataque controlado.
 
 ---
 
-## 7) Terraform para operar sem dor
+## 4) Dados sintéticos (obrigatório)
 
-## 7.1 Estrutura inicial
+Nunca usar dados reais. Use `Faker` para gerar:
+- usuários fictícios,
+- pedidos falsos,
+- eventos de pagamento simulados,
+- logs de auditoria sintéticos.
 
-- `infra/terraform/modules/network`
-- `infra/terraform/modules/iam`
-- `infra/terraform/modules/ecs_lab`
-- `infra/terraform/modules/observability`
-- `infra/terraform/stacks/session_lab`
+Padrões sensíveis também devem ser fictícios:
+- CPF fake,
+- email fake,
+- token fake,
+- cartão mascarado fake.
 
-## 7.2 Regras práticas
-
-- Um `stack/session_lab` parametrizado por `session_id`.
-- TTL obrigatório por tag + job de limpeza.
-- `terraform destroy` automático no encerramento ou timeout.
-- Quotas por sessão (limites de custo).
-
----
-
-## 8) Segurança e guardrails (obrigatório desde o dia 1)
-
-1. Conta AWS dedicada para labs (nunca em produção).
-2. IAM mínimo com permission boundaries.
-3. SCP bloqueando serviços fora do escopo.
-4. Bloqueio de regiões não usadas.
-5. Logs de auditoria habilitados por padrão.
-6. Dados de treino sintéticos (nunca PII real).
-7. Chaves e segredos só via Secrets Manager.
+Regra do lab: **resetar e regerar dados** a cada ciclo grande (semanal ou por sprint).
 
 ---
 
-## 9) “Espelhar” arquitetura do cliente sem se afogar
+## 5) Trilha de cenários (o coração do lab)
 
-Você **não** vai clonar produção inteira no começo.
+Cada cenário deve ter: objetivo, ataque/falha, sinais esperados, critérios de sucesso e evidências.
 
-Use a abordagem de **clone funcional reduzido**:
-- mapear apenas fluxo crítico (ex.: app → banco → fila),
-- reproduzir padrões de risco,
-- manter dados sintéticos,
-- validar em workshop técnico com cliente.
+## 5.1 Cenários de Chaos Engineering
 
-### Processo simples
-1. Entrevista técnica de 90 min.
-2. Coleta de diagrama e IaC existente.
-3. Seleção de 1 fluxo crítico.
-4. Montagem do blueprint simplificado.
-5. Aprovação e execução do piloto.
+1. **Pod Kill em serviço crítico**
+   - injeção: matar pods do `orders-service` aleatoriamente;
+   - aprendizado: replicas, probes, tempo de recuperação.
 
----
+2. **Latência e packet loss entre API e Postgres**
+   - injeção: adicionar delay/perda de rede;
+   - aprendizado: timeout, retry, circuit breaker, degradação graciosa.
 
-## 10) Roadmap solo founder (6 meses)
+3. **CPU stress no `catalog-service`**
+   - injeção: carga artificial de CPU;
+   - aprendizado: requests/limits e HPA corretamente ajustados.
 
-## Fase 1 — Semanas 1-4 (Fundação)
-- Monorepo, CI básico, auth, CRUD de sessões.
-- Runner Terraform funcional.
-- Primeiro cenário de incidente end-to-end.
+4. **Erro de ConfigMap em produção**
+   - injeção: config inválida;
+   - aprendizado: rollback rápido e validação pré-deploy.
 
-## Fase 2 — Semanas 5-8 (MVP técnico)
-- Completar 3 cenários Incidente + 3 Invasão.
-- Score engine simples e transparente.
-- Relatório final de sessão.
+5. **Falha de DNS interno**
+   - injeção: quebra de resolução de serviço por período curto;
+   - aprendizado: diagnóstico de rede e fallback.
 
-## Fase 3 — Semanas 9-12 (MVP comercial)
-- UX mínima para demo.
-- Fluxo de onboarding manual de cliente.
-- 2 pilotos pagos ou POC com chance real de contrato.
+6. **Node drain inesperado**
+   - injeção: simular indisponibilidade de worker;
+   - aprendizado: agendamento, tolerations, anti-affinity.
 
-## Fase 4 — Semanas 13-24 (Tração)
-- Melhorar estabilidade e observabilidade.
-- Adicionar mais cenários por setor.
-- Iniciar automação de onboarding.
+## 5.2 Cenários de Cybersecurity (ataque controlado)
 
----
+1. **Container privilegiado / root**
+   - ataque: workload inseguro;
+   - defesa: `securityContext` + policy Kyverno bloqueando.
 
-## 11) Rotina semanal recomendada (solo)
+2. **Segredo exposto em env/log**
+   - ataque: token em variável e log;
+   - defesa: rotação + remoção + redaction + externalização segura.
 
-- **Segunda:** produto + vendas (discovery com clientes).
-- **Terça/Quarta:** desenvolvimento core.
-- **Quinta:** cenários, testes de sessão, hardening.
-- **Sexta:** conteúdo/demo, documentação e follow-up comercial.
+3. **Lateral movement entre namespaces**
+   - ataque: tentativa de acesso de `lab-redteam` ao `lab-app`;
+   - defesa: NetworkPolicy default deny + allowlist explícita.
 
-Regra: 60% construir, 40% validar mercado.
+4. **RBAC excessivo (cluster-admin indevido)**
+   - ataque: exploração de ServiceAccount ampla;
+   - defesa: least privilege + revisão de bindings.
 
----
+5. **Imagem com CVE crítica**
+   - ataque: deploy de imagem vulnerável;
+   - defesa: scan no pipeline local + gate por severidade.
 
-## 12) KPIs que importam para 1 pessoa
-
-## Produto/negócio
-- Nº de pilotos ativos.
-- Taxa de conversão piloto → contrato.
-- Tempo para preparar uma sessão para cliente.
-
-## Técnico
-- Tempo de provisionamento do lab.
-- Custo por sessão.
-- Taxa de sessões concluídas sem erro crítico.
-
-## Resultado do cliente
-- Redução de MTTD/MTTR entre rodada 1 e 2.
-- Nº de vulnerabilidades corrigidas após treino.
+6. **Exfiltração simulada de dados sintéticos**
+   - ataque: job tentando exportar dados para endpoint fake;
+   - defesa: egress control + detecção + bloqueio.
 
 ---
 
-## 13) Custos e controle financeiro (essencial)
+## 6) Gamificação pessoal (simples, mas útil)
 
-- Definir orçamento mensal fixo de AWS (ex.: US$ 300–800 no início).
-- Encerrar labs automaticamente em 2h por padrão.
-- Desligar recursos ociosos diariamente.
-- Evitar serviços caros cedo (OpenSearch, EKS, NAT excessivo).
-- Usar instâncias/serviços mínimos para demo.
+Você joga contra o relógio e contra a recorrência:
 
----
+- +100: detectou rápido;
+- +150: conteve sem derrubar o resto;
+- +200: corrigiu causa raiz;
+- +100: documentou runbook e prevenção;
+- -150: correção que gera regressão;
+- -200: solução sem RCA (Root Cause Analysis).
 
-## 14) Backlog priorizado (primeiros 45 dias)
+Fórmula:
+`score = deteccao + contencao + correcao + documentacao - penalidades`
 
-## Must-have
-1. Criar/destruir ambiente por sessão.
-2. Login e gestão de sessões.
-3. Runner de cenário com agenda de eventos.
-4. Score básico por objetivos.
-5. Relatório simples com timeline + pontos.
-
-## Should-have
-6. 3º cenário de cada modo.
-7. Export de relatório em PDF.
-8. Página de ranking da sessão.
-
-## Won’t-have (agora)
-- Marketplace de cenários.
-- Multi-cloud.
-- Clone automático completo da arquitetura do cliente.
-- SIEM integrations complexas.
+Níveis:
+- Bronze: 0–999
+- Prata: 1000–1999
+- Ouro: 2000–2999
+- Platina: 3000+
 
 ---
 
-## 15) Estratégia comercial inicial (importantíssimo)
+## 7) Roadmap prático (12 semanas)
 
-1. Escolher nicho único (ex.: SaaS B2B com time de 5-30 engenheiros).
-2. Oferecer “Game Day de Segurança e Resiliência” como serviço piloto.
-3. Entregar relatório executivo + técnico no mesmo dia.
-4. Cobrar por sessão/pacote mensal.
+## Semanas 1–2: Fundação do cluster
+- subir k3d;
+- criar namespaces, quotas e limites;
+- publicar app mínima em K8s.
 
-### Oferta inicial sugerida
-- **Plano Piloto (4 semanas):** 2 sessões + relatório + plano de melhoria.
+## Semanas 3–4: Observabilidade
+- instalar Prometheus/Grafana/Loki;
+- dashboards com latência, erro, reinício, CPU/memória;
+- definir SLOs básicos.
+
+## Semanas 5–6: Chaos básico
+- executar cenários 1 e 2 de chaos;
+- medir MTTD/MTTR;
+- criar runbook dos incidentes.
+
+## Semanas 7–8: Segurança de base
+- aplicar RBAC mínimo e NetworkPolicy;
+- hardening de pods;
+- scan de imagens e correções.
+
+## Semanas 9–10: Cyber ataques simulados
+- executar 3 cenários cyber;
+- gerar evidências e pós-mortem;
+- repetir ataque após correção para validar mitigação.
+
+## Semanas 11–12: Simulado final
+- campeonato pessoal com 10 cenários mistos;
+- metas: menor MTTR e zero regressão crítica;
+- consolidar portfólio técnico (docs + manifests + lições aprendidas).
 
 ---
 
-## 16) Riscos reais do solo founder + mitigação
+## 8) Rotina semanal (4 a 6 horas)
 
-- **Risco:** tentar construir plataforma enterprise cedo demais.
-  - **Mitigação:** escopo MVP estrito e backlog agressivo de corte.
-- **Risco:** custo cloud sair de controle.
-  - **Mitigação:** TTL, quotas e alertas de billing.
-- **Risco:** pouca validação de mercado.
-  - **Mitigação:** demos semanais e pilotos desde o mês 2.
-- **Risco:** sobrecarga pessoal/burnout.
-  - **Mitigação:** roadmap trimestral, rotina fixa e automação de tarefas repetitivas.
+1. Subir ambiente limpo.
+2. Rodar 1 cenário chaos.
+3. Rodar 1 cenário cyber.
+4. Corrigir e endurecer manifests/policies.
+5. Repetir cenários para teste de regressão.
+6. Atualizar placar e diário técnico.
 
 ---
 
-## 17) Decisão final objetiva (se fosse começar amanhã)
+## 9) Estrutura de repositório recomendada
 
-- **Backend único:** FastAPI + Postgres.
-- **Frontend leve:** Next.js.
-- **Infra lab:** Terraform + ECS Fargate + S3 + CloudWatch.
-- **Orquestração:** Python runner + SQS/EventBridge.
-- **Segurança:** GuardDuty + Security Hub + CloudTrail + IAM mínimo.
-- **Produto:** 6 cenários totais (3 Incidente, 3 Invasão).
+- `k8s/base/` → namespaces, quotas, limites, policies base
+- `k8s/apps/` → manifests/charts da app
+- `k8s/observability/` → prometheus, grafana, loki
+- `k8s/security/` → kyverno, rbac, network policies, pod security
+- `scenarios/chaos/` → experimentos Litmus
+- `scenarios/cyber/` → scripts de ataque controlado
+- `data/synthetic/` → seeders e datasets
+- `runbooks/` → guias de resposta
+- `score/` → placar, métricas e evolução
+- `docs/` → arquitetura, diário e retrospectivas
 
-Com isso, você consegue lançar uma versão vendável sozinho, aprender com clientes reais e evoluir com segurança sem colapsar pela complexidade.
+---
+
+## 10) Guardrails (segurança e ética)
+
+- executar apenas em ambiente local isolado;
+- nunca expor serviços vulneráveis na internet pública;
+- nunca reutilizar credenciais reais;
+- não executar payload fora do escopo do lab;
+- manter rastreabilidade de toda falha/ataque e correção.
+
+---
+
+## 11) Limites técnicos para 16GB RAM
+
+Config sugerida:
+- cluster pequeno (1 server + 2 agents);
+- até 12–15 pods ativos simultâneos;
+- observabilidade com retenção curta (24h–48h);
+- desligar Grafana/Loki fora das sessões;
+- requests/limits obrigatórios para todos os workloads.
+
+Se pesar:
+- reduzir réplicas para 1 em serviços não críticos;
+- executar chaos e cyber em dias alternados;
+- pausar stack de observabilidade fora de troubleshooting.
+
+---
+
+## 12) Métricas de progresso pessoal
+
+- **MTTD**: tempo médio para detectar;
+- **MTTR**: tempo médio para recuperar;
+- **Taxa de bloqueio**: % de ataques que deixam de funcionar após hardening;
+- **Taxa de regressão**: % de cenários que voltam a falhar;
+- **Cobertura de runbooks**: quantos cenários têm playbook pronto.
+
+Metas para 90 dias:
+- reduzir MTTR em 40%;
+- bloquear pelo menos 80% dos ataques da trilha inicial;
+- manter regressão crítica abaixo de 10%.
+
+---
+
+## 13) Entrega final esperada (seu “portfólio de guerra”)
+
+Ao final, você terá:
+- ambiente Kubernetes funcional e resiliente;
+- coleção de ataques simulados e respectivas defesas;
+- runbooks e pós-mortems reutilizáveis;
+- evidências concretas da sua evolução em cloud/k8s/security.
+
+---
+
+## 14) Próximos passos imediatos (esta semana)
+
+1. Subir cluster k3d e validar saúde do cluster.
+2. Criar namespaces `lab-app`, `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`.
+3. Publicar app mínima (`api + postgres + redis`) com dados sintéticos.
+4. Instalar Prometheus/Grafana/Loki.
+5. Executar 1 cenário de chaos (pod kill) + 1 cyber (secret exposto) e documentar.
