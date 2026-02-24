@@ -325,7 +325,7 @@ Só iniciar “Semanas 1–2: Fundação do cluster” quando:
 
 ---
 
-## 12) Métricas de progresso pessoal
+## 13) Métricas de progresso pessoal
 
 - **MTTD**: tempo médio para detectar;
 - **MTTR**: tempo médio para recuperar;
@@ -340,7 +340,7 @@ Metas para 90 dias:
 
 ---
 
-## 13) Entrega final esperada (seu “portfólio de guerra”)
+## 14) Entrega final esperada (seu “portfólio de guerra”)
 
 Ao final, você terá:
 - ambiente Kubernetes funcional e resiliente;
@@ -350,10 +350,80 @@ Ao final, você terá:
 
 ---
 
-## 14) Próximos passos imediatos (esta semana)
+## 15) Próximos passos imediatos (esta semana)
 
 1. Subir cluster k3d e validar saúde do cluster.
-2. Criar namespaces `lab-app`, `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`.
-3. Publicar app mínima (`api + postgres + redis`) com dados sintéticos.
-4. Instalar Prometheus/Grafana/Loki.
-5. Executar 1 cenário de chaos (pod kill) + 1 cyber (secret exposto) e documentar.
+2. Concluir stack core do e-commerce no namespace `lab-app` (`api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`).
+3. Publicar dados sintéticos e validar fluxo mínimo ponta a ponta (`frontend -> api -> banco/cache`).
+4. Só então criar namespaces dedicados (`lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`) com quotas/limites.
+5. Iniciar observabilidade e depois cenários de chaos/cyber.
+
+---
+
+## 16) Checklist mestre de sprints (status em 24/02/2026)
+
+Legenda:
+- `[x]` concluído
+- `[ ]` pendente
+
+### Sprint 0 (pré-Semana 1) — Fundação de entrega
+- [x] Definir padrão CI/CD: GitHub Actions + Argo CD + Kustomize + GHCR
+- [x] Criar workflows (`ci-pr`, `build-publish`, `docs-guard`, `smoke-local`)
+- [x] Criar scripts de validação (`kustomize`, `kubeconform`, Kyverno, Trivy)
+- [x] Criar app mínima (`web-frontend`) com deploy em K8s
+- [x] Integrar Argo CD com este repositório (`PydaVi/brain-chaos`)
+- [x] Garantir app `brain-chaos-local` em `Synced` e `Healthy`
+- [x] Atualizar este documento como guia oficial
+
+### Sprint 1 (Semanas 1-2) — Fundação do cluster
+- [x] Subir cluster `k3d` (1 server + 2 agents)
+- [x] Publicar app mínima em Kubernetes (`web-frontend`)
+- [x] Criar namespace `lab-app` com quota e limitrange
+- [ ] Concluir stack core do e-commerce em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
+- [ ] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
+- [ ] Validar fluxo mínimo end-to-end com dados sintéticos
+- [ ] Versionar `imagePullSecret` + `ServiceAccount` (evitar patch manual pós-deploy)
+- [ ] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
+- [ ] Definir quotas/limites para todos os namespaces do lab
+
+### Sprint 2 (Semanas 3-4) — Observabilidade
+- [ ] Instalar Prometheus
+- [ ] Instalar Grafana
+- [ ] Instalar Loki + Promtail
+- [ ] Criar dashboards (latência, erro, reinício, CPU/memória)
+- [ ] Definir SLOs básicos e alertas iniciais
+
+### Sprint 3 (Semanas 5-6) — Chaos básico
+- [ ] Executar cenário chaos 1 (pod kill em serviço crítico)
+- [ ] Executar cenário chaos 2 (latência/perda entre API e Postgres)
+- [ ] Medir MTTD/MTTR dos cenários
+- [ ] Registrar runbooks e evidências
+
+### Sprint 4 (Semanas 7-8) — Segurança de base
+- [ ] Aplicar RBAC mínimo por serviço
+- [ ] Aplicar NetworkPolicy (default deny + allowlist)
+- [ ] Hardening de pods em todos os workloads
+- [ ] Ativar e estabilizar gates de scan de imagem para stack completa
+
+### Sprint 5 (Semanas 9-10) — Cyber ataques simulados
+- [ ] Executar 3 cenários cyber controlados
+- [ ] Documentar pós-mortem e evidências
+- [ ] Reexecutar cenários após mitigação para validar bloqueio
+
+### Sprint 6 (Semanas 11-12) — Simulado final
+- [ ] Rodar campeonato com 10 cenários mistos
+- [ ] Bater meta de MTTR e zero regressão crítica
+- [ ] Consolidar portfólio final (`docs/`, manifests, runbooks, score)
+
+### Destaque de amanhã (25/02/2026)
+
+Objetivo: fechar a base funcional do e-commerce em `lab-app` antes de expandir para novos namespaces.
+
+Checklist de amanhã:
+- [ ] Criar manifests de `postgres` e `redis` em `k8s/apps/`
+- [ ] Criar manifests de `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`
+- [ ] Montar overlay local com todas as dependências da stack core
+- [ ] Validar fluxo mínimo (`frontend -> api -> postgres/redis`) com dados sintéticos
+- [ ] Adicionar e versionar `imagePullSecret` + `ServiceAccount` dedicados (evitar patch manual)
+- [ ] Executar PR de validação end-to-end (`ci-pr` verde + merge + `build-publish` + sync Argo)
+- [ ] Depois da stack core estável, criar namespaces `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam` com quotas

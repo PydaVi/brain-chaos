@@ -1,0 +1,43 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Terraform/infra (future)
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Temporary
+tmp/
+.cache/
+
+# Kubernetes local artifacts
+*.kubeconfig
+kubeconfig*
