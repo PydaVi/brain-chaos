@@ -1,280 +1,292 @@
-# Plano Ultra-Enxuto (Baixo Custo) — Chaos + Segurança Gamificada para Engenheiros Cloud
+# Plano do Lab Pessoal — Kubernetes + Chaos Engineering + Cybersecurity (Local, Baixo Custo)
 
-> Versão otimizada para gastar **muito pouco** (ou quase zero).
-> Ambiente principal: **local**, rodando em máquina simples com **16GB RAM**.
-> Nuvem vira opcional para validação pontual, não para uso contínuo.
-
-## 1) Objetivo do projeto
-
-Criar uma plataforma/lab de treino para engenheiros de nuvem com foco em:
-- **Resiliência (chaos engineering)**
-- **Cibersegurança defensiva**
-- **Gamificação leve** (score, objetivos, tempo)
-
-Sem depender de conta AWS cara para cada sessão.
+> **Contexto:** este plano é para **lab pessoal de aprendizado**, não para produto.
+> **Objetivo:** aprender Kubernetes de verdade, com dados sintéticos, falhas reais (chaos) e ataques cibernéticos controlados.
+> **Restrição:** rodar em máquina simples com **16GB RAM** e custo próximo de zero.
 
 ---
 
-## 2) Princípio econômico (regra de ouro)
+## 1) Missão do lab
 
-1. **Local-first por padrão**.
-2. **Nuvem só em “modo validação”** (1 ou 2 cenários críticos, esporadicamente).
-3. **Tudo efêmero** (sobe, roda, derruba).
-4. **Open source sempre que possível**.
-5. **Sem serviços gerenciados caros no MVP**.
+Você vai montar um mini-ambiente de produção em Kubernetes, com serviços, banco e observabilidade, e depois submeter esse ambiente a:
+- **falhas operacionais propositalmente injetadas** (chaos engineering);
+- **ataques cibernéticos simulados e controlados** (red team de laboratório).
 
----
-
-## 3) Estratégia de arquitetura (baixo custo)
-
-## 3.1 Duas opções de execução
-
-### Opção A — 100% Local (recomendada no início)
-- Docker Compose
-- k3d (Kubernetes leve em Docker) **opcional**
-- PostgreSQL local
-- Redis local
-- Aplicações-alvo vulneráveis/simuladas em containers
-- Chaos com ferramentas open source
-
-Custo: praticamente zero (energia + internet).
-
-### Opção B — Híbrida (local + nuvem mínima)
-- 90% dos cenários local
-- 10% em nuvem (AWS Free Tier/Lightsail/conta de sandbox) para validar “realismo cloud”
-
-Custo: baixo e controlado por orçamento mensal.
+A regra é simples: cada falha/ataque precisa terminar com:
+1. detecção (como percebeu),
+2. contenção (como parou o impacto),
+3. correção (como evitou recorrência),
+4. evidência (logs, métricas, diff em manifest, runbook).
 
 ---
 
-## 4) Stack recomendada (simples e barata)
+## 2) Objetivos de aprendizagem (K8s + Resiliência + Segurança)
 
-- **Backend/Engine:** Python + FastAPI
-- **Frontend:** Next.js (ou até UI simples com HTMX/Tailwind)
-- **Banco:** PostgreSQL local (Docker)
-- **Fila (se precisar):** Redis + RQ/Celery (somente se necessário)
-- **Observabilidade local:** Prometheus + Grafana + Loki (ou só logs JSON no MVP)
-- **Orquestração de cenários:** scripts Python + Makefile
-- **Infra local:** Docker Compose (Kubernetes só depois)
+Ao concluir, você deve dominar na prática:
 
-### Por que isso?
-- Você roda tudo na sua máquina.
-- Sem cobrança por recurso em cloud.
-- Ferramentas maduras e fáceis de automatizar com IA.
+### Kubernetes
+- Deployments, StatefulSets, Services, Ingress;
+- ConfigMaps, Secrets, Requests/Limits, HPA;
+- probes (liveness/readiness/startup);
+- RBAC, ServiceAccounts, NetworkPolicies;
+- troubleshooting via `kubectl logs`, `describe`, `events`, `top`, `exec`.
 
----
+### Resiliência
+- comportamento sob perda de pod, latência, indisponibilidade e erro de configuração;
+- rollback e hardening de config;
+- melhoria de MTTD/MTTR com observabilidade.
 
-## 5) Design do produto (MVP realista para 1 pessoa)
-
-## 5.1 Módulos mínimos
-
-1. **Scenario Catalog**: lista de desafios (incidente e invasão).
-2. **Session Runner**: sobe cenário local, injeta falha/ataque, controla tempo.
-3. **Scoring Engine**: pontuação por evidências técnicas.
-4. **Player Dashboard**: objetivos, tempo, eventos, score.
-5. **Report Generator**: relatório final com ações corretas/incorretas.
-
-## 5.2 Fluxo de sessão
-
-1. Jogador escolhe cenário.
-2. Runner sobe containers do cenário.
-3. Sistema dispara incidente/ataque programado.
-4. Jogador responde via terminal/arquivos/config.
-5. Engine valida evidências e atualiza score.
-6. Relatório final + teardown automático.
+### Segurança
+- hardening de containers (não-root, capabilities mínimas, FS read-only);
+- varredura de vulnerabilidades em imagens;
+- segmentação por namespace e política default deny;
+- mitigação de vazamento de segredos e permissões excessivas.
 
 ---
 
-## 6) Cenários de Chaos (baixo custo, alta utilidade)
+## 3) Arquitetura do lab (feita para 16GB)
 
-## 6.1 Incidente/Resiliência (3 iniciais)
+## 3.1 Plataforma
+- **Cluster local:** `k3d` (recomendado) com 1 control-plane + 2 workers.
+- **SO host:** Linux, macOS ou WSL2.
+- **Container runtime:** Docker.
 
-1. **API instável por latência artificial**
-   - Objetivo: restaurar SLO (latência/erro).
-2. **Banco indisponível temporariamente**
-   - Objetivo: retry/circuit breaker/timeout correto.
-3. **Config quebrada em serviço crítico**
-   - Objetivo: detectar rápido e aplicar rollback seguro.
+## 3.2 Aplicação sintética (domínio: e-commerce)
 
-### Ferramentas sugeridas
-- Toxiproxy (latência/falha de rede)
-- Pumba ou Chaos Mesh (se usar k8s depois)
-- Scripts bash/python para matar/reiniciar containers
+Serviços em `lab-app`:
+1. `web-frontend` (UI simples)
+2. `api-gateway`
+3. `orders-service`
+4. `catalog-service`
+5. `payments-mock`
+6. `postgres` (stateful)
+7. `redis`
 
----
+Suporte:
+- `synthetic-seeder` para gerar dados falsos diariamente;
+- `job-traffic-generator` para gerar carga artificial (RPS baixo).
 
-## 7) Cenários de Segurança (baixo custo, defensivo)
-
-## 7.1 Invasão/Defesa (3 iniciais)
-
-1. **Credencial vazada em .env**
-   - Objetivo: rotacionar segredo e bloquear uso indevido.
-2. **Permissão excessiva em serviço interno simulado**
-   - Objetivo: aplicar least privilege e impedir acesso indevido.
-3. **Endpoint vulnerável a input malicioso (lab controlado)**
-   - Objetivo: corrigir validação + bloquear exploração + evidenciar resposta.
-
-### Ferramentas sugeridas
-- Trivy (scan de imagens/deps)
-- Semgrep (SAST simples)
-- OWASP ZAP baseline (scan web controlado)
-- Falco (opcional, detecção em runtime)
+## 3.3 Observabilidade e segurança
+- `lab-observability`: Prometheus + Grafana + Loki + Promtail;
+- `lab-chaos`: LitmusChaos;
+- `lab-security`: Trivy + Kyverno;
+- `lab-redteam`: pods/scripts de ataque controlado.
 
 ---
 
-## 8) Gamificação simples (sem overengineering)
+## 4) Dados sintéticos (obrigatório)
 
-- Pontos por objetivo cumprido.
-- Bônus por tempo de resolução.
-- Penalidade por correção insegura.
-- Níveis por trilha (Bronze, Prata, Ouro).
-- Ranking local por sessão.
+Nunca usar dados reais. Use `Faker` para gerar:
+- usuários fictícios,
+- pedidos falsos,
+- eventos de pagamento simulados,
+- logs de auditoria sintéticos.
 
-### Fórmula simples de score
-`score = objetivos*100 + bonus_tempo - penalidades`
+Padrões sensíveis também devem ser fictícios:
+- CPF fake,
+- email fake,
+- token fake,
+- cartão mascarado fake.
 
----
-
-## 9) Requisitos para máquina 16GB RAM
-
-## 9.1 Envelope de recursos
-
-- 6 a 10 containers simultâneos no máximo.
-- Sem cluster k8s completo no começo.
-- Grafana/Prometheus opcionais (ativar só quando precisar).
-- Limitar memória por container (`mem_limit`).
-
-## 9.2 Perfil sugerido
-
-- SO: Linux (ou WSL2 no Windows)
-- Docker Desktop/Engine
-- 30GB+ livres em disco (imagens + logs)
-- CPU 4+ cores (ideal)
+Regra do lab: **resetar e regerar dados** a cada ciclo grande (semanal ou por sprint).
 
 ---
 
-## 10) Estrutura de repositório (enxuta)
+## 5) Trilha de cenários (o coração do lab)
 
-- `apps/api` (FastAPI)
-- `apps/web` (Next.js)
-- `scenarios/chaos/*`
-- `scenarios/security/*`
-- `engine/runner/*`
-- `engine/scoring/*`
-- `infra/local/docker-compose.yml`
-- `infra/local/makefile`
-- `docs/*`
+Cada cenário deve ter: objetivo, ataque/falha, sinais esperados, critérios de sucesso e evidências.
 
----
+## 5.1 Cenários de Chaos Engineering
 
-## 11) Roadmap econômico (12 semanas)
+1. **Pod Kill em serviço crítico**
+   - injeção: matar pods do `orders-service` aleatoriamente;
+   - aprendizado: replicas, probes, tempo de recuperação.
 
-## Semanas 1-2 — Fundação local
-- Setup monorepo
-- Compose base
-- Sessão simples (start/stop)
+2. **Latência e packet loss entre API e Postgres**
+   - injeção: adicionar delay/perda de rede;
+   - aprendizado: timeout, retry, circuit breaker, degradação graciosa.
 
-## Semanas 3-4 — Primeiro modo Chaos
-- 1 cenário incident
-- Score básico
-- Relatório textual
+3. **CPU stress no `catalog-service`**
+   - injeção: carga artificial de CPU;
+   - aprendizado: requests/limits e HPA corretamente ajustados.
 
-## Semanas 5-6 — Primeiro modo Segurança
-- 1 cenário invasão/defesa
-- Validação por evidências
+4. **Erro de ConfigMap em produção**
+   - injeção: config inválida;
+   - aprendizado: rollback rápido e validação pré-deploy.
 
-## Semanas 7-8 — Gamificação mínima
-- Ranking
-- Níveis
-- Dashboard simples
+5. **Falha de DNS interno**
+   - injeção: quebra de resolução de serviço por período curto;
+   - aprendizado: diagnóstico de rede e fallback.
 
-## Semanas 9-10 — Estabilidade
-- Teardown robusto
-- Coleta de métricas essencial
-- Melhorar UX
+6. **Node drain inesperado**
+   - injeção: simular indisponibilidade de worker;
+   - aprendizado: agendamento, tolerations, anti-affinity.
 
-## Semanas 11-12 — Piloto
-- Pacote demo completo (3 + 3 cenários)
-- Teste com 3-5 engenheiros
-- Feedback + ajustes
+## 5.2 Cenários de Cybersecurity (ataque controlado)
 
----
+1. **Container privilegiado / root**
+   - ataque: workload inseguro;
+   - defesa: `securityContext` + policy Kyverno bloqueando.
 
-## 12) Custos estimados
+2. **Segredo exposto em env/log**
+   - ataque: token em variável e log;
+   - defesa: rotação + remoção + redaction + externalização segura.
 
-## 12.1 Modo local
-- Cloud: **R$ 0**
-- Ferramentas: **R$ 0** (open source)
-- Possível custo: domínio/host de landing page
+3. **Lateral movement entre namespaces**
+   - ataque: tentativa de acesso de `lab-redteam` ao `lab-app`;
+   - defesa: NetworkPolicy default deny + allowlist explícita.
 
-## 12.2 Modo híbrido (opcional)
-- AWS validação pontual: limite de orçamento (ex.: R$ 100-300/mês)
-- Só subir recurso cloud durante demo específica
-- Destruição automática obrigatória após teste
+4. **RBAC excessivo (cluster-admin indevido)**
+   - ataque: exploração de ServiceAccount ampla;
+   - defesa: least privilege + revisão de bindings.
+
+5. **Imagem com CVE crítica**
+   - ataque: deploy de imagem vulnerável;
+   - defesa: scan no pipeline local + gate por severidade.
+
+6. **Exfiltração simulada de dados sintéticos**
+   - ataque: job tentando exportar dados para endpoint fake;
+   - defesa: egress control + detecção + bloqueio.
 
 ---
 
-## 13) Quando usar AWS mesmo assim?
+## 6) Gamificação pessoal (simples, mas útil)
 
-Somente para:
-1. Validar 1 cenário “real cloud IAM/network” antes de vender para empresa.
-2. Fazer demo enterprise pontual.
-3. Testar integração com serviços reais de monitoramento cloud.
+Você joga contra o relógio e contra a recorrência:
 
-Nunca usar AWS como ambiente padrão de desenvolvimento diário.
+- +100: detectou rápido;
+- +150: conteve sem derrubar o resto;
+- +200: corrigiu causa raiz;
+- +100: documentou runbook e prevenção;
+- -150: correção que gera regressão;
+- -200: solução sem RCA (Root Cause Analysis).
 
----
+Fórmula:
+`score = deteccao + contencao + correcao + documentacao - penalidades`
 
-## 14) KPIs úteis (baixo custo)
-
-- Tempo médio para subir cenário local.
-- Taxa de sessões sem erro técnico.
-- Tempo de detecção e resposta do jogador.
-- Custo mensal da operação (meta: próximo de zero).
-- Satisfação dos usuários do piloto.
-
----
-
-## 15) Riscos e mitigação
-
-- **Risco:** máquina local sofrer com performance.
-  - **Mitigação:** poucos containers, limites de memória, cenários curtos.
-- **Risco:** pouca aderência “enterprise cloud”.
-  - **Mitigação:** trilha híbrida opcional com 1-2 cenários AWS.
-- **Risco:** escopo crescer demais.
-  - **Mitigação:** backlog strict MVP (3 caos + 3 segurança).
+Níveis:
+- Bronze: 0–999
+- Prata: 1000–1999
+- Ouro: 2000–2999
+- Platina: 3000+
 
 ---
 
-## 16) Backlog priorizado (MVP)
+## 7) Roadmap prático (12 semanas)
 
-## Must-have
-1. Runner local de sessões
-2. 3 cenários de chaos
-3. 3 cenários de segurança
-4. Score engine simples
-5. Relatório final
+## Semanas 1–2: Fundação do cluster
+- subir k3d;
+- criar namespaces, quotas e limites;
+- publicar app mínima em K8s.
 
-## Should-have
-6. Dashboard web básico
-7. Ranking por usuário
-8. Export JSON/PDF
+## Semanas 3–4: Observabilidade
+- instalar Prometheus/Grafana/Loki;
+- dashboards com latência, erro, reinício, CPU/memória;
+- definir SLOs básicos.
 
-## Won’t-have agora
-- Multi-tenant enterprise
-- Multi-cloud
-- SIEM avançado
-- Cluster Kubernetes completo
+## Semanas 5–6: Chaos básico
+- executar cenários 1 e 2 de chaos;
+- medir MTTD/MTTR;
+- criar runbook dos incidentes.
+
+## Semanas 7–8: Segurança de base
+- aplicar RBAC mínimo e NetworkPolicy;
+- hardening de pods;
+- scan de imagens e correções.
+
+## Semanas 9–10: Cyber ataques simulados
+- executar 3 cenários cyber;
+- gerar evidências e pós-mortem;
+- repetir ataque após correção para validar mitigação.
+
+## Semanas 11–12: Simulado final
+- campeonato pessoal com 10 cenários mistos;
+- metas: menor MTTR e zero regressão crítica;
+- consolidar portfólio técnico (docs + manifests + lições aprendidas).
 
 ---
 
-## 17) Decisão final (recomendação direta)
+## 8) Rotina semanal (4 a 6 horas)
 
-Se você quer manter a essência de chaos + segurança gastando pouco:
+1. Subir ambiente limpo.
+2. Rodar 1 cenário chaos.
+3. Rodar 1 cenário cyber.
+4. Corrigir e endurecer manifests/policies.
+5. Repetir cenários para teste de regressão.
+6. Atualizar placar e diário técnico.
 
-- Comece **100% local com Docker Compose**.
-- Foque em cenários de engenharia que treinam resposta real.
-- Use gamificação leve para engajamento.
-- Só leve parte para AWS quando precisar validar venda enterprise.
+---
 
-Assim, você aprende rápido, entrega valor prático para engenheiros cloud e evita que o projeto morra por custo de infraestrutura.
+## 9) Estrutura de repositório recomendada
+
+- `k8s/base/` → namespaces, quotas, limites, policies base
+- `k8s/apps/` → manifests/charts da app
+- `k8s/observability/` → prometheus, grafana, loki
+- `k8s/security/` → kyverno, rbac, network policies, pod security
+- `scenarios/chaos/` → experimentos Litmus
+- `scenarios/cyber/` → scripts de ataque controlado
+- `data/synthetic/` → seeders e datasets
+- `runbooks/` → guias de resposta
+- `score/` → placar, métricas e evolução
+- `docs/` → arquitetura, diário e retrospectivas
+
+---
+
+## 10) Guardrails (segurança e ética)
+
+- executar apenas em ambiente local isolado;
+- nunca expor serviços vulneráveis na internet pública;
+- nunca reutilizar credenciais reais;
+- não executar payload fora do escopo do lab;
+- manter rastreabilidade de toda falha/ataque e correção.
+
+---
+
+## 11) Limites técnicos para 16GB RAM
+
+Config sugerida:
+- cluster pequeno (1 server + 2 agents);
+- até 12–15 pods ativos simultâneos;
+- observabilidade com retenção curta (24h–48h);
+- desligar Grafana/Loki fora das sessões;
+- requests/limits obrigatórios para todos os workloads.
+
+Se pesar:
+- reduzir réplicas para 1 em serviços não críticos;
+- executar chaos e cyber em dias alternados;
+- pausar stack de observabilidade fora de troubleshooting.
+
+---
+
+## 12) Métricas de progresso pessoal
+
+- **MTTD**: tempo médio para detectar;
+- **MTTR**: tempo médio para recuperar;
+- **Taxa de bloqueio**: % de ataques que deixam de funcionar após hardening;
+- **Taxa de regressão**: % de cenários que voltam a falhar;
+- **Cobertura de runbooks**: quantos cenários têm playbook pronto.
+
+Metas para 90 dias:
+- reduzir MTTR em 40%;
+- bloquear pelo menos 80% dos ataques da trilha inicial;
+- manter regressão crítica abaixo de 10%.
+
+---
+
+## 13) Entrega final esperada (seu “portfólio de guerra”)
+
+Ao final, você terá:
+- ambiente Kubernetes funcional e resiliente;
+- coleção de ataques simulados e respectivas defesas;
+- runbooks e pós-mortems reutilizáveis;
+- evidências concretas da sua evolução em cloud/k8s/security.
+
+---
+
+## 14) Próximos passos imediatos (esta semana)
+
+1. Subir cluster k3d e validar saúde do cluster.
+2. Criar namespaces `lab-app`, `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`.
+3. Publicar app mínima (`api + postgres + redis`) com dados sintéticos.
+4. Instalar Prometheus/Grafana/Loki.
+5. Executar 1 cenário de chaos (pod kill) + 1 cyber (secret exposto) e documentar.
