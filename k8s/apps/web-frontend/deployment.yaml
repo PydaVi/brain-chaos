@@ -14,11 +14,17 @@ spec:
       labels:
         app: web-frontend
     spec:
+      volumes:
+        - name: tmp
+          emptyDir: {}
       containers:
         - name: web-frontend
           image: web-frontend:dev
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
