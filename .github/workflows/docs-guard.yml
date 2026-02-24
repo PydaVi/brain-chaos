@@ -1,0 +1,23 @@
+name: docs-guard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  docs-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify plan document updates for platform changes
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          ./scripts/ci/docs_guard.sh "origin/${{ github.base_ref }}"

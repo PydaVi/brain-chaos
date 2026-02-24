@@ -1,0 +1,113 @@
+name: build-publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web-frontend/**'
+      - '.github/workflows/build-publish.yml'
+      - 'scripts/ci/**'
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: build-publish-main
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: web-frontend
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    outputs:
+      image_repo: ${{ steps.meta.outputs.image_repo }}
+      image_tag: ${{ steps.meta.outputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set metadata
+        id: meta
+        run: |
+          OWNER_LC="$(echo \"${GITHUB_REPOSITORY_OWNER}\" | tr '[:upper:]' '[:lower:]')"
+          REPO_LC="$(echo \"${GITHUB_REPOSITORY#*/}\" | tr '[:upper:]' '[:lower:]')"
+          IMAGE_REPO="ghcr.io/${OWNER_LC}/${REPO_LC}/${IMAGE_NAME}"
+          IMAGE_TAG="${GITHUB_SHA::12}"
+          echo "image_repo=${IMAGE_REPO}" >> "$GITHUB_OUTPUT"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/web-frontend
+          file: apps/web-frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.image_repo }}:${{ steps.meta.outputs.image_tag }}
+
+      - name: Scan image with Trivy (critical)
+        env:
+          SEVERITY: CRITICAL
+        run: ./scripts/ci/image_scan.sh "${{ steps.meta.outputs.image_repo }}:${{ steps.meta.outputs.image_tag }}"
+
+      - name: Generate SBOM (CycloneDX)
+        run: |
+          docker run --rm \
+            -v "$PWD:/work" \
+            -w /work \
+            aquasec/trivy:0.58.1 \
+            image --format cyclonedx --output sbom-web-frontend.cdx "${{ steps.meta.outputs.image_repo }}:${{ steps.meta.outputs.image_tag }}"
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-web-frontend-${{ steps.meta.outputs.image_tag }}
+          path: sbom-web-frontend.cdx
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image with Cosign (keyless)
+        run: cosign sign --yes "${{ steps.meta.outputs.image_repo }}:${{ steps.meta.outputs.image_tag }}"
+
+  gitops-update:
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kustomize
+        run: ./scripts/ci/install_kustomize.sh
+
+      - name: Update local overlay image tag
+        run: ./scripts/ci/update_overlay_image.sh "${{ needs.build-and-publish.outputs.image_repo }}" "${{ needs.build-and-publish.outputs.image_tag }}"
+
+      - name: Create PR with GitOps update
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(gitops): update web-frontend image to ${{ needs.build-and-publish.outputs.image_tag }}"
+          title: "chore(gitops): update web-frontend image"
+          body: |
+            Automated GitOps image update.
+
+            - Image: `${{ needs.build-and-publish.outputs.image_repo }}:${{ needs.build-and-publish.outputs.image_tag }}`
+          branch: chore/gitops-image-update
+          delete-branch: true
+          labels: |
+            ci
+            gitops

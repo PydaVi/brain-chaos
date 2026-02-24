@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: brain-chaos-lab
+  namespace: argocd
+spec:
+  description: Brain Chaos local learning project
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: lab-app
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

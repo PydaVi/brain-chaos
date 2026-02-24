@@ -258,6 +258,73 @@ Se pesar:
 
 ---
 
+## 12) Fundação de CI/CD (antes da Sprint 1)
+
+Decisões oficiais para este lab:
+- **CI:** GitHub Actions;
+- **CD:** GitOps com Argo CD;
+- **Manifests:** Kustomize;
+- **Registry de imagens:** GHCR (`ghcr.io`).
+
+Objetivo da fundação:
+- garantir que toda mudança em manifests, segurança e automação passe por validação antes de merge;
+- manter rastreabilidade do estado desejado do cluster no Git;
+- aprender fluxo de mercado de Kubernetes com baixo custo local.
+
+### 12.1 Fluxo padrão (source of truth)
+
+1. Dev abre PR.
+2. GitHub Actions roda validações:
+   - build de manifests com Kustomize;
+   - validação de schema Kubernetes;
+   - policy checks (Kyverno);
+   - scan de segurança (Trivy).
+3. Com merge em `main`, o pipeline:
+   - builda imagem do `web-frontend`;
+   - publica no GHCR com tag imutável (SHA curto);
+   - propõe PR automático de atualização GitOps em `k8s/overlays/local/kustomization.yaml`.
+4. Argo CD sincroniza o cluster local com estado do Git (`selfHeal` + `prune`).
+
+### 12.2 Estrutura de CI/CD adotada no repositório
+
+- `.github/workflows/ci-pr.yml`:
+  - gate de PR para manifests, policy e segurança;
+- `.github/workflows/build-publish.yml`:
+  - build/push de imagem e PR automático de update GitOps;
+- `.github/workflows/docs-guard.yml`:
+  - bloqueia mudança de `k8s/`, `.github/` e `scripts/` sem atualizar este plano;
+- `scripts/ci/`:
+  - scripts versionados de validação, scan, policy e atualização de imagem;
+- `k8s/argocd/`:
+  - `AppProject` e `Application` para sincronizar overlay local.
+
+### 12.3 Guardrails de qualidade e segurança
+
+- Falha obrigatória no CI para:
+  - manifest inválido;
+  - policy Kyverno não atendida;
+  - vulnerabilidade **CRITICAL** detectada pelo Trivy.
+- Padrões de entrega:
+  - não usar `latest` no GitOps;
+  - promover imagem por tag imutável;
+  - manter evidência de mudança por PR/commit.
+
+### 12.4 Convenções obrigatórias de manutenção
+
+- Toda mudança de plataforma (`k8s/`, `.github/`, `scripts/`) exige atualização deste documento;
+- `k8s/overlays/local/kustomization.yaml` é o ponto de atualização automática de imagem;
+- repositório configurado para integração Argo CD + GHCR: `PydaVi/brain-chaos`.
+
+### 12.5 Critério de pronto para iniciar Sprint 1
+
+Só iniciar “Semanas 1–2: Fundação do cluster” quando:
+- CI de PR estiver verde com os gates ativos;
+- workflow de build/publicação estiver enviando imagem para GHCR;
+- Argo CD estiver aplicando o overlay local a partir de `main`;
+- este documento estiver atualizado com qualquer ajuste de fluxo.
+
+---
+
 ## 12) Métricas de progresso pessoal
 
 - **MTTD**: tempo médio para detectar;

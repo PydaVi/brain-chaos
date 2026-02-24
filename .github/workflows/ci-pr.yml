@@ -1,0 +1,69 @@
+name: ci-pr
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kustomize
+        run: ./scripts/ci/install_kustomize.sh
+
+      - name: Install kubeconform
+        run: ./scripts/ci/install_kubeconform.sh
+
+      - name: Validate manifests
+        run: ./scripts/ci/validate_manifests.sh
+
+  policy-check:
+    runs-on: ubuntu-latest
+    needs: validate-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kustomize
+        run: ./scripts/ci/install_kustomize.sh
+
+      - name: Validate policies against rendered resources
+        run: ./scripts/ci/policy_check.sh
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: validate-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan IaC with Trivy (critical)
+        env:
+          SEVERITY: CRITICAL
+        run: ./scripts/ci/security_scan.sh k8s
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run tests when present
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm test
+          else
+            echo "No package.json found. Skipping unit tests."
+          fi
