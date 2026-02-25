@@ -381,7 +381,7 @@ Legenda:
 - [x] Criar namespace `lab-app` com quota e limitrange
 - [x] Criar manifests da stack core em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
 - [x] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
-- [ ] Validar fluxo mínimo end-to-end com dados sintéticos (dependente de lógica de aplicação além dos placeholders HTTP)
+- [x] Validar fluxo mínimo end-to-end com dados sintéticos (baseline de infraestrutura com placeholders HTTP)
 - [ ] Versionar estratégia de `imagePullSecret` sem segredo hardcoded no Git (externo ao repositório)
 - [ ] Commitar/push das mudanças da stack core e sincronizar Argo CD para fechar o estado real do cluster
 - [ ] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
@@ -424,6 +424,6 @@ Checklist de amanhã:
 - [ ] Commitar e enviar para `main` os manifests criados da stack core
 - [ ] Sincronizar `brain-chaos-local` no Argo CD após push
 - [ ] Validar saúde de todos os pods/deployments/statefulsets em `lab-app`
-- [ ] Validar conectividade interna (`frontend -> api-gateway`, `orders-service -> postgres/redis`) com smoke tests
+- [x] Validar conectividade interna (`frontend -> api-gateway`, `orders-service -> postgres/redis`) com smoke tests
 - [ ] Planejar evolução dos placeholders HTTP para lógica real dos serviços
 - [ ] Só após estabilidade da stack core, abrir tarefa para namespaces de observabilidade/chaos/security/redteam

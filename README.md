@@ -62,6 +62,11 @@ kubectl get app -n argocd
 kubectl get all -n lab-app
 ```
 
+6. Rodar validacao E2E com dados sinteticos
+```bash
+./scripts/lab/validate_e2e_synthetic.sh
+```
+
 ## Documentacao principal
 
 - Plano oficial: `docs/plano-projeto-aws-gamificado.md`
