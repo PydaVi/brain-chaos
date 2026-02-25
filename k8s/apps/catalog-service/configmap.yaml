@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-service-index
+  labels:
+    app: catalog-service
+data:
+  index.html: |
+    <html><body><h1>catalog-service</h1><p>catalog API placeholder.</p></body></html>

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lab-app-sa
+  namespace: lab-app
+imagePullSecrets:
+  - name: ghcr-pull-secret

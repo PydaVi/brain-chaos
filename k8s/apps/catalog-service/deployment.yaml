@@ -1,31 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-frontend
+  name: catalog-service
   labels:
-    app: web-frontend
+    app: catalog-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web-frontend
+      app: catalog-service
   template:
     metadata:
       labels:
-        app: web-frontend
+        app: catalog-service
     spec:
       serviceAccountName: lab-app-sa
       volumes:
         - name: tmp
           emptyDir: {}
+        - name: content
+          configMap:
+            name: catalog-service-index
       containers:
-        - name: web-frontend
-          image: web-frontend:dev
+        - name: catalog-service
+          image: nginxinc/nginx-unprivileged:1.27-alpine
           ports:
             - containerPort: 8080
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: content
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true

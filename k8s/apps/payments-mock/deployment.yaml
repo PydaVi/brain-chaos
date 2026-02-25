@@ -1,31 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-frontend
+  name: payments-mock
   labels:
-    app: web-frontend
+    app: payments-mock
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: web-frontend
+      app: payments-mock
   template:
     metadata:
       labels:
-        app: web-frontend
+        app: payments-mock
     spec:
       serviceAccountName: lab-app-sa
       volumes:
         - name: tmp
           emptyDir: {}
+        - name: content
+          configMap:
+            name: payments-mock-index
       containers:
-        - name: web-frontend
-          image: web-frontend:dev
+        - name: payments-mock
+          image: nginxinc/nginx-unprivileged:1.27-alpine
           ports:
             - containerPort: 8080
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: content
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: index.html
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true

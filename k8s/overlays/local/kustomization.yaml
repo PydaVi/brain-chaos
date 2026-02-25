@@ -6,6 +6,12 @@ namespace: lab-app
 resources:
   - ../../base
   - ../../apps/web-frontend
+  - ../../apps/api-gateway
+  - ../../apps/orders-service
+  - ../../apps/catalog-service
+  - ../../apps/payments-mock
+  - ../../apps/redis
+  - ../../apps/postgres
 
 images:
   - name: web-frontend

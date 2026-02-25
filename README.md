@@ -11,6 +11,7 @@ Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity 
 - Estrutura Kustomize (`k8s/base`, `k8s/apps`, `k8s/overlays`)
 - Policy Kyverno inicial (`runAsNonRoot`)
 - App minima `web-frontend` publicada e sincronizada via Argo CD
+- Manifests da stack core criados: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `redis`, `postgres`
 
 ### Rodando agora
 - Namespace: `lab-app`
@@ -19,7 +20,7 @@ Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity 
 - Argo CD App: `brain-chaos-local` com status esperado `Synced/Healthy`
 
 ### Ainda nao implementado
-- Stack completa do e-commerce (`api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`)
+- Logica de negocio real nos servicos do e-commerce (hoje estao como placeholders HTTP)
 - Observabilidade (Prometheus/Grafana/Loki)
 - Cenarios de chaos e cyber da trilha completa
 

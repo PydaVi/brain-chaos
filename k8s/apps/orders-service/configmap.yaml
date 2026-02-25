@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-service-index
+  labels:
+    app: orders-service
+data:
+  index.html: |
+    <html><body><h1>orders-service</h1><p>connected to postgres and redis (next iteration logic).</p></body></html>

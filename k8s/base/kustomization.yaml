@@ -5,3 +5,4 @@ resources:
   - namespaces/lab-app.yaml
   - quotas/lab-app-resourcequota.yaml
   - limits/lab-app-limitrange.yaml
+  - serviceaccounts/lab-app-sa.yaml

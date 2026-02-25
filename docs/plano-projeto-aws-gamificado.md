@@ -360,7 +360,7 @@ Ao final, você terá:
 
 ---
 
-## 16) Checklist mestre de sprints (status em 24/02/2026)
+## 16) Checklist mestre de sprints (status em 25/02/2026)
 
 Legenda:
 - `[x]` concluído
@@ -379,10 +379,11 @@ Legenda:
 - [x] Subir cluster `k3d` (1 server + 2 agents)
 - [x] Publicar app mínima em Kubernetes (`web-frontend`)
 - [x] Criar namespace `lab-app` com quota e limitrange
-- [ ] Concluir stack core do e-commerce em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
-- [ ] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
-- [ ] Validar fluxo mínimo end-to-end com dados sintéticos
-- [ ] Versionar `imagePullSecret` + `ServiceAccount` (evitar patch manual pós-deploy)
+- [x] Criar manifests da stack core em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
+- [x] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
+- [ ] Validar fluxo mínimo end-to-end com dados sintéticos (dependente de lógica de aplicação além dos placeholders HTTP)
+- [ ] Versionar estratégia de `imagePullSecret` sem segredo hardcoded no Git (externo ao repositório)
+- [ ] Commitar/push das mudanças da stack core e sincronizar Argo CD para fechar o estado real do cluster
 - [ ] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
 - [ ] Definir quotas/limites para todos os namespaces do lab
 
@@ -417,13 +418,12 @@ Legenda:
 
 ### Destaque de amanhã (25/02/2026)
 
-Objetivo: fechar a base funcional do e-commerce em `lab-app` antes de expandir para novos namespaces.
+Objetivo: fechar o ciclo GitOps da stack core (commit/push/sync) e estabilizar runtime no cluster.
 
 Checklist de amanhã:
-- [ ] Criar manifests de `postgres` e `redis` em `k8s/apps/`
-- [ ] Criar manifests de `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`
-- [ ] Montar overlay local com todas as dependências da stack core
-- [ ] Validar fluxo mínimo (`frontend -> api -> postgres/redis`) com dados sintéticos
-- [ ] Adicionar e versionar `imagePullSecret` + `ServiceAccount` dedicados (evitar patch manual)
-- [ ] Executar PR de validação end-to-end (`ci-pr` verde + merge + `build-publish` + sync Argo)
-- [ ] Depois da stack core estável, criar namespaces `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam` com quotas
+- [ ] Commitar e enviar para `main` os manifests criados da stack core
+- [ ] Sincronizar `brain-chaos-local` no Argo CD após push
+- [ ] Validar saúde de todos os pods/deployments/statefulsets em `lab-app`
+- [ ] Validar conectividade interna (`frontend -> api-gateway`, `orders-service -> postgres/redis`) com smoke tests
+- [ ] Planejar evolução dos placeholders HTTP para lógica real dos serviços
+- [ ] Só após estabilidade da stack core, abrir tarefa para namespaces de observabilidade/chaos/security/redteam

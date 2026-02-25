@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payments-mock-index
+  labels:
+    app: payments-mock
+data:
+  index.html: |
+    <html><body><h1>payments-mock</h1><p>mock payment provider.</p></body></html>

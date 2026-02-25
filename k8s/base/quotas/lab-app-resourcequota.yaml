@@ -5,7 +5,7 @@ metadata:
   namespace: lab-app
 spec:
   hard:
-    limits.cpu: "2"
+    limits.cpu: "3"
     limits.memory: 4Gi
     requests.cpu: "1"
     requests.memory: 2Gi
