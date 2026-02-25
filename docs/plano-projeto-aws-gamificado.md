@@ -378,6 +378,7 @@ Legenda:
 ### Sprint 1 (Semanas 1-2) — Fundação do cluster
 - [x] Subir cluster `k3d` (1 server + 2 agents)
 - [x] Publicar app mínima em Kubernetes (`web-frontend`)
+- [x] Evoluir `web-frontend` para UI v1 (catálogo, carrinho, checkout simulado e painel de status)
 - [x] Criar namespace `lab-app` com quota e limitrange
 - [x] Criar manifests da stack core em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
 - [x] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
@@ -416,7 +417,7 @@ Legenda:
 - [ ] Bater meta de MTTR e zero regressão crítica
 - [ ] Consolidar portfólio final (`docs/`, manifests, runbooks, score)
 
-### Destaque de amanhã (25/02/2026)
+### Destaque de amanhã (26/02/2026)
 
 Objetivo: fechar o ciclo GitOps da stack core (commit/push/sync) e estabilizar runtime no cluster.
 
