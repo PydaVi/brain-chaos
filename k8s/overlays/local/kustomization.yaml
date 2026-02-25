@@ -16,4 +16,4 @@ resources:
 images:
   - name: web-frontend
     newName: ghcr.io/pydavi/brain-chaos/web-frontend
-    newTag: dev
+    newTag: ui-v1-202602242359
