@@ -1,12 +1,65 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Brain Chaos Lab</title>
+    <title>Brain Chaos Store</title>
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <h1>Brain Chaos Lab - web-frontend</h1>
-    <p>CI/CD foundation is running.</p>
+    <header class="hero">
+      <div>
+        <p class="badge">BRAIN CHAOS LAB</p>
+        <h1>Brain Chaos Store</h1>
+        <p class="subtitle">UI v1 do e-commerce para validar fluxo local em Kubernetes</p>
+      </div>
+      <button id="status-refresh" class="ghost-btn">Atualizar status dos servicos</button>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <div class="card-head">
+          <h2>Catalogo</h2>
+          <p>Produtos sintéticos</p>
+        </div>
+        <div id="product-grid" class="grid"></div>
+      </section>
+
+      <aside class="card sticky">
+        <div class="card-head">
+          <h2>Carrinho</h2>
+          <p>Checkout simulado</p>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="summary">
+          <div><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+          <div><span>Frete</span><strong id="shipping">R$ 19,90</strong></div>
+          <div class="total"><span>Total</span><strong id="total">R$ 19,90</strong></div>
+        </div>
+        <button id="checkout-btn" class="primary-btn">Finalizar pedido</button>
+        <p id="checkout-result" class="checkout-result"></p>
+      </aside>
+    </main>
+
+    <section class="card status-card">
+      <div class="card-head">
+        <h2>Status dos servicos</h2>
+        <p>Verificacao via proxy do frontend</p>
+      </div>
+      <div id="service-status" class="status-grid"></div>
+    </section>
+
+    <template id="product-template">
+      <article class="product">
+        <h3 class="product-name"></h3>
+        <p class="product-desc"></p>
+        <div class="product-footer">
+          <strong class="product-price"></strong>
+          <button class="add-btn">Adicionar</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js"></script>
   </body>
 </html>
