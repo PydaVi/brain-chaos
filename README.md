@@ -67,7 +67,13 @@ kubectl get all -n lab-app
 ./scripts/lab/validate_e2e_synthetic.sh
 ```
 
+7. Bootstrap/rotacao do imagePullSecret (fora do Git)
+```bash
+GHCR_USERNAME=PydaVi GHCR_TOKEN=<SEU_TOKEN> ./scripts/lab/bootstrap_ghcr_pull_secret.sh
+```
+
 ## Documentacao principal
 
 - Plano oficial: `docs/plano-projeto-aws-gamificado.md`
 - Bootstrap CI/CD: `docs/cicd-bootstrap.md`
+- Runbook imagePullSecret: `docs/runbooks/ghcr-imagepullsecret.md`

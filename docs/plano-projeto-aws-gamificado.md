@@ -383,7 +383,7 @@ Legenda:
 - [x] Criar manifests da stack core em `lab-app`: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`
 - [x] Definir ConfigMaps/Secrets/ServiceAccounts da stack core
 - [x] Validar fluxo mínimo end-to-end com dados sintéticos (baseline de infraestrutura com placeholders HTTP)
-- [ ] Versionar estratégia de `imagePullSecret` sem segredo hardcoded no Git (externo ao repositório)
+- [x] Versionar estratégia de `imagePullSecret` sem segredo hardcoded no Git (externo ao repositório)
 - [ ] Commitar/push das mudanças da stack core e sincronizar Argo CD para fechar o estado real do cluster
 - [ ] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
 - [ ] Definir quotas/limites para todos os namespaces do lab
