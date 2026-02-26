@@ -10,6 +10,14 @@ spec:
   destinations:
     - namespace: lab-app
       server: https://kubernetes.default.svc
+    - namespace: lab-observability
+      server: https://kubernetes.default.svc
+    - namespace: lab-chaos
+      server: https://kubernetes.default.svc
+    - namespace: lab-security
+      server: https://kubernetes.default.svc
+    - namespace: lab-redteam
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: ''
       kind: Namespace
