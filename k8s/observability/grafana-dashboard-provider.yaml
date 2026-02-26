@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provider
+  namespace: lab-observability
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: brain-chaos-lab
+        orgId: 1
+        folder: Brain Chaos Lab
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards

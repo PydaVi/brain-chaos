@@ -72,6 +72,13 @@ kubectl get all -n lab-app
 GHCR_USERNAME=PydaVi GHCR_TOKEN=<SEU_TOKEN> ./scripts/lab/bootstrap_ghcr_pull_secret.sh
 ```
 
+8. Acessar observabilidade local
+```bash
+kubectl port-forward -n lab-observability svc/prometheus 9090:9090
+kubectl port-forward -n lab-observability svc/grafana 3000:3000
+kubectl port-forward -n lab-observability svc/loki 3100:3100
+```
+
 ## Documentacao principal
 
 - Plano oficial: `docs/plano-projeto-aws-gamificado.md`

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: lab-observability
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: prometheus
+        static_configs:
+          - targets:
+              - localhost:9090
+
+      - job_name: lab-app-services
+        metrics_path: /
+        static_configs:
+          - targets:
+              - web-frontend.lab-app.svc.cluster.local:80
+              - api-gateway.lab-app.svc.cluster.local:80
+              - orders-service.lab-app.svc.cluster.local:80
+              - catalog-service.lab-app.svc.cluster.local:80
+              - payments-mock.lab-app.svc.cluster.local:80

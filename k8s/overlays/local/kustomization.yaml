@@ -4,6 +4,7 @@ kind: Kustomization
 
 resources:
   - ../../base
+  - ../../observability
   - ../../apps/web-frontend
   - ../../apps/api-gateway
   - ../../apps/orders-service

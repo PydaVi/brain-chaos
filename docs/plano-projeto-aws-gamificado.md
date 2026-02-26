@@ -389,9 +389,9 @@ Legenda:
 - [x] Definir quotas/limites para todos os namespaces do lab
 
 ### Sprint 2 (Semanas 3-4) — Observabilidade
-- [ ] Instalar Prometheus
-- [ ] Instalar Grafana
-- [ ] Instalar Loki + Promtail
+- [x] Instalar Prometheus
+- [x] Instalar Grafana
+- [x] Instalar Loki + Promtail (fase inicial com Loki; Promtail entra na próxima iteração)
 - [ ] Criar dashboards (latência, erro, reinício, CPU/memória)
 - [ ] Definir SLOs básicos e alertas iniciais
 
