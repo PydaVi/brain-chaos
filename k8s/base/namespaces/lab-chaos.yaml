@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-chaos
+  labels:
+    app.kubernetes.io/part-of: brain-chaos
+    lab.brainchaos.io/domain: chaos

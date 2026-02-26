@@ -3,6 +3,18 @@ kind: Kustomization
 
 resources:
   - namespaces/lab-app.yaml
+  - namespaces/lab-observability.yaml
+  - namespaces/lab-chaos.yaml
+  - namespaces/lab-security.yaml
+  - namespaces/lab-redteam.yaml
   - quotas/lab-app-resourcequota.yaml
+  - quotas/lab-observability-resourcequota.yaml
+  - quotas/lab-chaos-resourcequota.yaml
+  - quotas/lab-security-resourcequota.yaml
+  - quotas/lab-redteam-resourcequota.yaml
   - limits/lab-app-limitrange.yaml
+  - limits/lab-observability-limitrange.yaml
+  - limits/lab-chaos-limitrange.yaml
+  - limits/lab-security-limitrange.yaml
+  - limits/lab-redteam-limitrange.yaml
   - serviceaccounts/lab-app-sa.yaml

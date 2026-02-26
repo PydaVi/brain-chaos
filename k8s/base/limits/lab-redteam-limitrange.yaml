@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: lab-redteam
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 200m
+        memory: 192Mi
+      defaultRequest:
+        cpu: 50m
+        memory: 96Mi

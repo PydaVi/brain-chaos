@@ -385,8 +385,8 @@ Legenda:
 - [x] Validar fluxo mínimo end-to-end com dados sintéticos (baseline de infraestrutura com placeholders HTTP)
 - [x] Versionar estratégia de `imagePullSecret` sem segredo hardcoded no Git (externo ao repositório)
 - [ ] Commitar/push das mudanças da stack core e sincronizar Argo CD para fechar o estado real do cluster
-- [ ] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
-- [ ] Definir quotas/limites para todos os namespaces do lab
+- [x] Criar namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
+- [x] Definir quotas/limites para todos os namespaces do lab
 
 ### Sprint 2 (Semanas 3-4) — Observabilidade
 - [ ] Instalar Prometheus
