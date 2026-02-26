@@ -41,3 +41,6 @@ tmp/
 # Kubernetes local artifacts
 *.kubeconfig
 kubeconfig*
+
+# Local agent preferences
+AGENTS.md
