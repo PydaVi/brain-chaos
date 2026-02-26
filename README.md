@@ -2,7 +2,7 @@
 
 Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity em ambiente local (k3d), com foco em prática real e baixo custo.
 
-## Estado atual (24/02/2026)
+## Estado atual (26/02/2026)
 
 ### Ja implementado
 - Cluster local `k3d` (1 control-plane + 2 workers)
@@ -12,6 +12,8 @@ Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity 
 - Policy Kyverno inicial (`runAsNonRoot`)
 - App minima `web-frontend` publicada e sincronizada via Argo CD
 - Manifests da stack core criados: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `redis`, `postgres`
+- Observabilidade base instalada em `lab-observability`: Prometheus, Grafana, Loki
+- Dashboard provisionado automaticamente: `Lab App Overview`
 
 ### Rodando agora
 - Namespace: `lab-app`
@@ -21,7 +23,7 @@ Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity 
 
 ### Ainda nao implementado
 - Logica de negocio real nos servicos do e-commerce (hoje estao como placeholders HTTP)
-- Observabilidade (Prometheus/Grafana/Loki)
+- Instrumentacao `/metrics` nos servicos da app para dashboards de negocio reais
 - Cenarios de chaos e cyber da trilha completa
 
 ## Estrutura do repositorio

@@ -360,7 +360,7 @@ Ao final, você terá:
 
 ---
 
-## 16) Checklist mestre de sprints (status em 25/02/2026)
+## 16) Checklist mestre de sprints (status em 26/02/2026)
 
 Legenda:
 - `[x]` concluído
@@ -392,7 +392,8 @@ Legenda:
 - [x] Instalar Prometheus
 - [x] Instalar Grafana
 - [x] Instalar Loki + Promtail (fase inicial com Loki; Promtail entra na próxima iteração)
-- [ ] Criar dashboards (latência, erro, reinício, CPU/memória)
+- [x] Criar dashboard inicial provisionado no Grafana (`Lab App Overview`)
+- [ ] Criar dashboards completos (latência, erro, reinício, CPU/memória)
 - [ ] Definir SLOs básicos e alertas iniciais
 
 ### Sprint 3 (Semanas 5-6) — Chaos básico
@@ -417,14 +418,13 @@ Legenda:
 - [ ] Bater meta de MTTR e zero regressão crítica
 - [ ] Consolidar portfólio final (`docs/`, manifests, runbooks, score)
 
-### Destaque de amanhã (26/02/2026)
+### Destaque de amanhã (27/02/2026)
 
-Objetivo: fechar o ciclo GitOps da stack core (commit/push/sync) e estabilizar runtime no cluster.
+Objetivo: evoluir observabilidade de infra para observabilidade de aplicação.
 
 Checklist de amanhã:
-- [ ] Commitar e enviar para `main` os manifests criados da stack core
-- [ ] Sincronizar `brain-chaos-local` no Argo CD após push
-- [ ] Validar saúde de todos os pods/deployments/statefulsets em `lab-app`
-- [x] Validar conectividade interna (`frontend -> api-gateway`, `orders-service -> postgres/redis`) com smoke tests
-- [ ] Planejar evolução dos placeholders HTTP para lógica real dos serviços
-- [ ] Só após estabilidade da stack core, abrir tarefa para namespaces de observabilidade/chaos/security/redteam
+- [ ] Adicionar endpoint `/metrics` nos serviços da app (ou sidecar/exporter) para sair do `up=0` em alvos HTTP
+- [ ] Revisar jobs de scrape no Prometheus para métricas reais de app
+- [ ] Expandir dashboard: latência, taxa de erro, reinícios e uso de CPU/memória
+- [ ] Definir 2-3 SLOs iniciais (disponibilidade e tempo de resposta)
+- [ ] Documentar critérios de sucesso para início dos cenários de chaos/cyber com observabilidade ativa
