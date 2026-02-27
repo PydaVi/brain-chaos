@@ -258,6 +258,56 @@ Se pesar:
 
 ---
 
+## 17) Execução Real do Projeto (Checklist Vivo)
+
+> Atualize esta seção ao final de cada sessão.
+
+### Sprint 1 — Fundação + GitOps
+- [x] Estrutura Kustomize (`k8s/base`, `k8s/apps`, `k8s/overlays`)
+- [x] Namespaces iniciais (`lab-app`) e app base de e-commerce sintético
+- [x] Argo CD instalado e Application apontando para `k8s/overlays/local`
+- [x] Pipeline inicial com GitHub Actions (validação de manifest/lint básico)
+- [x] Estratégia de `imagePullSecret` sem segredo hardcoded no Git
+- [x] README e `.gitignore` base do repositório
+
+### Sprint 1.5 — Isolamento de Domínios
+- [x] Namespaces restantes: `lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`
+- [x] `ResourceQuota` e `LimitRange` por namespace
+
+### Sprint 2 — Observabilidade
+- [x] Prometheus, Grafana e Loki no namespace `lab-observability`
+- [x] Dashboards iniciais (latência, erro HTTP, reinício, CPU/memória)
+- [x] `blackbox-exporter` para probes HTTP sintéticos
+- [x] `kube-state-metrics` para métricas de workload
+- [x] RBAC dedicado do `kube-state-metrics` (`ServiceAccount`, `ClusterRole`, `ClusterRoleBinding`)
+- [x] Ajuste de Argo `AppProject` para permitir recursos cluster-scoped de RBAC
+- [x] Correção de rollout sob quota (estratégia `maxSurge: 0`, `maxUnavailable: 1`) em:
+  - [x] `kube-state-metrics`
+  - [x] `prometheus`
+- [x] Argo estabilizado em `Synced` + `Healthy`
+
+### Sprint 3 — Segurança Base (Próximo)
+- [ ] NetworkPolicy `default deny` por namespace + allowlists mínimas
+- [ ] Kyverno policies iniciais (além de `runAsNonRoot`): `readOnlyRootFilesystem`, bloqueio de `privileged`, capabilities mínimas
+- [ ] RBAC review geral de service accounts da stack
+- [ ] Trivy scan automatizado no fluxo CI
+
+### Sprint 4 — Chaos Engineering
+- [ ] Instalar LitmusChaos e validar experimento simples (pod delete)
+- [ ] Cenário 1: kill de pod em serviço crítico
+- [ ] Cenário 2: latência/rede degradada
+- [ ] Runbooks com MTTD/MTTR e evidências
+
+### Sprint 5 — Cyber Simulado + Gamificação
+- [ ] Cenários de ataque controlado em `lab-redteam`
+- [ ] Pós-mortem e validação de correção (reteste do ataque)
+- [ ] Estrutura de score e trilha de evolução
+
+### Foco de Amanhã
+- [ ] Fechar Sprint 3 (Segurança Base), iniciando por `NetworkPolicy default deny` e regras mínimas de comunicação entre namespaces/serviços.
+
+---
+
 ## 12) Fundação de CI/CD (antes da Sprint 1)
 
 Decisões oficiais para este lab:
@@ -350,13 +400,13 @@ Ao final, você terá:
 
 ---
 
-## 15) Próximos passos imediatos (esta semana)
+## 15) Próximos passos imediatos (próxima sessão)
 
-1. Subir cluster k3d e validar saúde do cluster.
-2. Concluir stack core do e-commerce no namespace `lab-app` (`api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `postgres`, `redis`).
-3. Publicar dados sintéticos e validar fluxo mínimo ponta a ponta (`frontend -> api -> banco/cache`).
-4. Só então criar namespaces dedicados (`lab-observability`, `lab-chaos`, `lab-security`, `lab-redteam`) com quotas/limites.
-5. Iniciar observabilidade e depois cenários de chaos/cyber.
+1. Aplicar `NetworkPolicy default deny` em todos os namespaces de lab.
+2. Criar allowlists mínimas de comunicação entre serviços e observabilidade.
+3. Endurecer políticas Kyverno (`readOnlyRootFilesystem`, `privileged=false`, capabilities mínimas).
+4. Revisar RBAC de service accounts e remover permissões excessivas.
+5. Integrar Trivy no CI com regra de bloqueio para severidade crítica.
 
 ---
 
