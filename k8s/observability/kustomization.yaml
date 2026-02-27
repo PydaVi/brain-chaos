@@ -5,6 +5,7 @@ resources:
   - blackbox-config.yaml
   - blackbox-deployment.yaml
   - blackbox-service.yaml
+  - kube-state-metrics-rbac.yaml
   - kube-state-metrics-deployment.yaml
   - kube-state-metrics-service.yaml
   - prometheus-config.yaml
