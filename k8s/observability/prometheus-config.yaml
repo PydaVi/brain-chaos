@@ -15,12 +15,26 @@ data:
           - targets:
               - localhost:9090
 
-      - job_name: lab-app-services
-        metrics_path: /
+      - job_name: kube-state-metrics
         static_configs:
           - targets:
-              - web-frontend.lab-app.svc.cluster.local:80
-              - api-gateway.lab-app.svc.cluster.local:80
-              - orders-service.lab-app.svc.cluster.local:80
-              - catalog-service.lab-app.svc.cluster.local:80
-              - payments-mock.lab-app.svc.cluster.local:80
+              - kube-state-metrics.lab-observability.svc.cluster.local:8080
+
+      - job_name: blackbox-http
+        metrics_path: /probe
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+              - http://web-frontend.lab-app.svc.cluster.local:80
+              - http://api-gateway.lab-app.svc.cluster.local:80
+              - http://orders-service.lab-app.svc.cluster.local:80
+              - http://catalog-service.lab-app.svc.cluster.local:80
+              - http://payments-mock.lab-app.svc.cluster.local:80
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: blackbox-exporter.lab-observability.svc.cluster.local:9115

@@ -8,132 +8,246 @@ data:
     {
       "annotations": {"list": []},
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
       "id": null,
       "links": [],
-      "liveNow": false,
       "panels": [
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [
-                {"options": {"0": {"text": "DOWN"}, "1": {"text": "UP"}}, "type": "value"}
-              ],
-              "max": 1,
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"color": "red", "value": null},
-                  {"color": "green", "value": 1}
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
           "id": 1,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "center",
-            "orientation": "auto",
-            "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
           "targets": [
-            {
-              "datasource": {"type": "prometheus", "uid": "prometheus"},
-              "editorMode": "code",
-              "expr": "sum(up{job=\"lab-app-services\"})",
-              "instant": true,
-              "legendFormat": "{{instance}}",
-              "range": false,
-              "refId": "A"
-            }
+            {"expr": "probe_success{job=\"blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A"}
           ],
-          "title": "Lab Services UP (count)",
-          "type": "stat"
+          "title": "Lab Services Availability",
+          "type": "timeseries"
         },
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
           "fieldConfig": {"defaults": {}, "overrides": []},
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
           "id": 2,
           "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "single"}},
           "targets": [
-            {
-              "datasource": {"type": "prometheus", "uid": "prometheus"},
-              "editorMode": "code",
-              "expr": "rate(prometheus_tsdb_head_samples_appended_total{job=\"prometheus\"}[5m])",
-              "legendFormat": "{{instance}}",
-              "range": true,
-              "refId": "A"
-            }
+            {"expr": "probe_duration_seconds{job=\"blackbox-http\"}", "legendFormat": "{{instance}}", "refId": "A"}
           ],
-          "title": "Prometheus Sample Ingestion Rate",
+          "title": "Probe Duration (s)",
           "type": "timeseries"
         },
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
           "fieldConfig": {"defaults": {}, "overrides": []},
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
           "id": 3,
           "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "single"}},
           "targets": [
-            {
-              "datasource": {"type": "prometheus", "uid": "prometheus"},
-              "editorMode": "code",
-              "expr": "process_resident_memory_bytes{job=\"prometheus\"}",
-              "legendFormat": "{{instance}}",
-              "range": true,
-              "refId": "A"
-            }
+            {"expr": "kube_pod_container_status_restarts_total{namespace=~\"lab-.*\"}", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
           ],
-          "title": "Prometheus Memory Usage (bytes)",
+          "title": "Container Restarts (all lab namespaces)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "15s",
+      "schemaVersion": 39,
+      "style": "dark",
+      "tags": ["k8s", "lab", "overview"],
+      "templating": {"list": []},
+      "time": {"from": "now-30m", "to": "now"},
+      "timezone": "browser",
+      "title": "Lab App Overview",
+      "uid": "lab-app-overview",
+      "version": 2,
+      "weekStart": ""
+    }
+
+  service-latency-error.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 1,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "avg_over_time(probe_duration_seconds{job=\"blackbox-http\"}[5m])", "legendFormat": "{{instance}}", "refId": "A"}
+          ],
+          "title": "Avg Latency 5m (s)",
           "type": "timeseries"
         },
         {
           "datasource": {"type": "prometheus", "uid": "prometheus"},
           "fieldConfig": {"defaults": {}, "overrides": []},
-          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
-          "id": 4,
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "id": 2,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "(1 - avg_over_time(probe_success{job=\"blackbox-http\"}[5m])) * 100", "legendFormat": "{{instance}}", "refId": "A"}
+          ],
+          "title": "Error Rate 5m (%)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+          "id": 3,
           "options": {
             "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false},
             "showHeader": true
           },
           "targets": [
-            {
-              "datasource": {"type": "prometheus", "uid": "prometheus"},
-              "editorMode": "code",
-              "expr": "up",
-              "format": "table",
-              "instant": true,
-              "range": false,
-              "refId": "A"
-            }
+            {"expr": "probe_success{job=\"blackbox-http\"}", "format": "table", "instant": true, "refId": "A"}
           ],
-          "title": "All Targets Table",
-          "transformations": [
-            {"id": "labelsToFields", "options": {"mode": "columns"}}
-          ],
+          "title": "Current Probe Status",
+          "transformations": [{"id": "labelsToFields", "options": {"mode": "columns"}}],
           "type": "table"
         }
       ],
       "refresh": "15s",
       "schemaVersion": 39,
       "style": "dark",
-      "tags": ["k8s", "lab", "prometheus"],
+      "tags": ["k8s", "latency", "error", "synthetic"],
       "templating": {"list": []},
       "time": {"from": "now-30m", "to": "now"},
-      "timepicker": {},
       "timezone": "browser",
-      "title": "Lab App Overview",
-      "uid": "lab-app-overview",
+      "title": "Service Latency & Error (Synthetics)",
+      "uid": "service-latency-error",
+      "version": 1,
+      "weekStart": ""
+    }
+
+  k8s-workload-health.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+          "id": 1,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "kube_pod_container_status_restarts_total{namespace=~\"lab-.*\"}", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
+          ],
+          "title": "Container Restarts",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "id": 2,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "kube_deployment_status_replicas_available{namespace=~\"lab-.*\"}", "legendFormat": "{{namespace}}/{{deployment}}", "refId": "A"}
+          ],
+          "title": "Deployment Replicas Available",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "id": 3,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "kube_statefulset_status_replicas_ready{namespace=~\"lab-.*\"}", "legendFormat": "{{namespace}}/{{statefulset}}", "refId": "A"}
+          ],
+          "title": "StatefulSet Replicas Ready",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "15s",
+      "schemaVersion": 39,
+      "style": "dark",
+      "tags": ["k8s", "health", "restarts"],
+      "templating": {"list": []},
+      "time": {"from": "now-30m", "to": "now"},
+      "timezone": "browser",
+      "title": "K8s Workload Health (Restarts/Status)",
+      "uid": "k8s-workload-health",
+      "version": 1,
+      "weekStart": ""
+    }
+
+  k8s-cpu-memory.json: |
+    {
+      "annotations": {"list": []},
+      "editable": true,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 1,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "sum by (namespace, pod) (kube_pod_container_resource_requests{resource=\"cpu\", namespace=~\"lab-.*\"})", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
+          ],
+          "title": "CPU Requests by Pod (cores)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "id": 2,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "sum by (namespace, pod) (kube_pod_container_resource_requests{resource=\"memory\", namespace=~\"lab-.*\"})", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
+          ],
+          "title": "Memory Requests by Pod (bytes)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "id": 3,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "sum by (namespace, pod) (kube_pod_container_resource_limits{resource=\"cpu\", namespace=~\"lab-.*\"})", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
+          ],
+          "title": "CPU Limits by Pod (cores)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {"defaults": {}, "overrides": []},
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "id": 4,
+          "options": {"legend": {"displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single"}},
+          "targets": [
+            {"expr": "sum by (namespace, pod) (kube_pod_container_resource_limits{resource=\"memory\", namespace=~\"lab-.*\"})", "legendFormat": "{{namespace}}/{{pod}}", "refId": "A"}
+          ],
+          "title": "Memory Limits by Pod (bytes)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "15s",
+      "schemaVersion": 39,
+      "style": "dark",
+      "tags": ["k8s", "cpu", "memory"],
+      "templating": {"list": []},
+      "time": {"from": "now-30m", "to": "now"},
+      "timezone": "browser",
+      "title": "K8s CPU & Memory (Workloads)",
+      "uid": "k8s-cpu-memory",
       "version": 1,
       "weekStart": ""
     }
