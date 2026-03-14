@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-app
+  labels:
+    # Usado depois por policies/seletores para identificar workloads de app.
+    purpose: app

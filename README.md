@@ -1,88 +1,130 @@
-# Brain Chaos Lab
+# brain-chaos
 
-Lab pessoal para aprender Kubernetes, GitOps, Chaos Engineering e Cybersecurity em ambiente local (k3d), com foco em prática real e baixo custo.
+Laboratório Kubernetes local para aprender segurança Cloud Native com profundidade real.
 
-## Estado atual (26/02/2026)
+A premissa é simples: você não aprende a defender um cluster lendo documentação.
+Você aprende montando o ambiente, entendendo cada camada, simulando os ataques e medindo o que foi detectado, e o que passou despercebido.
 
-### Ja implementado
-- Cluster local `k3d` (1 control-plane + 2 workers)
-- GitOps com Argo CD apontando para este repo
-- Pipeline CI/CD com GitHub Actions + GHCR
-- Estrutura Kustomize (`k8s/base`, `k8s/apps`, `k8s/overlays`)
-- Policy Kyverno inicial (`runAsNonRoot`)
-- App minima `web-frontend` publicada e sincronizada via Argo CD
-- Manifests da stack core criados: `api-gateway`, `orders-service`, `catalog-service`, `payments-mock`, `redis`, `postgres`
-- Observabilidade base instalada em `lab-observability`: Prometheus, Grafana, Loki
-- Dashboard provisionado automaticamente: `Lab App Overview`
+---
 
-### Rodando agora
-- Namespace: `lab-app`
-- Deployment: `web-frontend`
-- Service: `web-frontend` (ClusterIP)
-- Argo CD App: `brain-chaos-local` com status esperado `Synced/Healthy`
+## O que este lab cobre
 
-### Ainda nao implementado
-- Logica de negocio real nos servicos do e-commerce (hoje estao como placeholders HTTP)
-- Instrumentacao `/metrics` nos servicos da app para dashboards de negocio reais
-- Cenarios de chaos e cyber da trilha completa
-
-## Estrutura do repositorio
-
-- `apps/` codigo das aplicacoes
-- `k8s/base/` namespace, quotas e limites base
-- `k8s/apps/` manifests das aplicacoes
-- `k8s/overlays/` overlays por contexto (local/chaos/security)
-- `k8s/argocd/` AppProject e Application do Argo CD
-- `k8s/security/` policies e hardening
-- `scripts/ci/` utilitarios de validacao/scan/update
-- `.github/workflows/` pipelines CI/CD
-- `docs/` guia oficial e bootstrap
-
-## Como usar (quickstart)
-
-1. Subir cluster local
-```bash
-k3d cluster create brain-chaos --servers 1 --agents 2 --k3s-arg "--disable=traefik@server:0"
-kubectl config use-context k3d-brain-chaos
-kubectl get nodes
+```
+Kubernetes internals → CI/CD seguro → políticas de cluster →
+rede com eBPF → runtime security → observabilidade →
+aplicação alvo → chaos engineering → red team → cenários mistos
 ```
 
-2. Instalar Argo CD
+Cada fase tem um objetivo de aprendizado, não de instalação.
+O critério de avanço é entender por que a ferramenta funciona — não só tê-la rodando.
+
+---
+
+## Stack
+
+| Camada | Ferramentas |
+|--------|-------------|
+| Cluster local | k3d, kubectl, helm |
+| CI/CD e GitOps | GitHub Actions, GHCR, ArgoCD |
+| Supply chain | Trivy, Cosign, Kyverno |
+| CNI | Cilium, Hubble |
+| Runtime security | Falco |
+| Políticas de cluster | Kyverno, NetworkPolicy, RBAC |
+| Observabilidade | Prometheus, Grafana, Loki, Alertmanager |
+| Chaos | LitmusChaos |
+| Aplicação alvo | e-commerce sintético (Go/Node) |
+
+**Pré-requisitos:** Docker, k3d, kubectl, helm, conta no GitHub com Actions habilitado.
+
+---
+
+## Roteiro
+
+O projeto tem 10 fases em ordem obrigatória.
+Não existe atalho: cada fase depende do entendimento da anterior.
+
+| Fase | Foco |
+|------|------|
+| 1 | Fundamentos Kubernetes — control plane, data plane, namespaces Linux, cgroups |
+| 2 | CI/CD e Supply Chain — GitHub Actions, Trivy, Cosign, assinatura de imagem, ArgoCD |
+| 3 | Segurança de cluster — Kyverno, RBAC, NetworkPolicy, PodSecurity |
+| 4 | CNI com eBPF — Cilium, Hubble, L7 visibility, substituição do kube-proxy |
+| 5 | Runtime security — Falco, syscalls, regras customizadas, integração com Loki |
+| 6 | Observabilidade — Prometheus, Grafana, Loki, dashboard de segurança |
+| 7 | Aplicação alvo — instrumentação, health checks, gerador de tráfego, baseline |
+| 8 | Chaos Engineering — LitmusChaos, MTTD, MTTR, 6 cenários de falha |
+| 9 | Red Team — 10 simulações de ataque mapeadas ao MITRE ATT&CK for Containers |
+| 10 | Integração — chaos e ataque simultâneos, incidente real simulado |
+
+---
+
+## Como começar
+
 ```bash
-kubectl create namespace argocd
-kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-kubectl apply -k k8s/argocd
+# Suba o cluster
+./scripts/lab/bootstrap-cluster.sh
+
+# Estude os fundamentos da Fase 1
+cat docs/fase-1/00-fundamentos.md
+
+# Execute os exercícios e registre suas respostas
+cat docs/fase-1/exercicios.md
 ```
 
-3. Configurar acesso ao repo privado no Argo CD (token GitHub read-only) e sincronizar app `brain-chaos-local`.
+A Fase 1 não instala nada além do cluster.
+O objetivo é entender o que já existe antes de adicionar qualquer camada.
 
-4. Publicar imagem no GHCR e configurar `imagePullSecret` no namespace `lab-app`.
+---
 
-5. Validar saude
-```bash
-kubectl get app -n argocd
-kubectl get all -n lab-app
+## Gamificação
+
+Cada cenário de chaos ou red team termina com pontuação:
+
+| Resultado | Pontos |
+|-----------|--------|
+| Detectou o evento (log, alerta, dashboard) | +100 |
+| Conteve sem impacto nos outros serviços | +150 |
+| Corrigiu a causa raiz | +200 |
+| Documentou runbook reutilizável | +100 |
+| Correção causou regressão | -150 |
+| Solução sem RCA documentado | -200 |
+| Ferramenta que deveria bloquear não bloqueou | -100 |
+
+Placar em `score/placar.md`. Nível atual: Bronze.
+
+---
+
+## Estrutura do repositório
+
+```
+k8s/
+  base/           # namespaces, quotas, limits
+  apps/           # manifests da aplicação alvo
+  security/       # Kyverno, Cilium, Falco, RBAC
+  observability/  # Prometheus, Grafana, Loki
+  argocd/         # AppProject, Application
+  chaos/          # experimentos LitmusChaos
+
+apps/             # código fonte dos serviços (Fase 7)
+
+.github/
+  workflows/      # pipelines CI/CD (Fase 2)
+
+scenarios/
+  chaos/          # documentação dos experimentos por fase
+  cyber/          # documentação dos ataques por fase
+
+docs/
+  fase-N/         # notas, exercícios e decisões por fase
+  runbooks/       # playbooks reutilizáveis
+
+score/
+  placar.md       # pontuação acumulada
 ```
 
-6. Rodar validacao E2E com dados sinteticos
-```bash
-./scripts/lab/validate_e2e_synthetic.sh
-```
+---
 
-7. Bootstrap/rotacao do imagePullSecret (fora do Git)
-```bash
-GHCR_USERNAME=PydaVi GHCR_TOKEN=<SEU_TOKEN> ./scripts/lab/bootstrap_ghcr_pull_secret.sh
-```
+## Contexto
 
-8. Acessar observabilidade local
-```bash
-kubectl port-forward -n lab-observability svc/prometheus 9090:9090
-kubectl port-forward -n lab-observability svc/grafana 3000:3000
-kubectl port-forward -n lab-observability svc/loki 3100:3100
-```
-
-## Documentacao principal
-
-- Plano oficial: `docs/plano-projeto-aws-gamificado.md`
-- Bootstrap CI/CD: `docs/cicd-bootstrap.md`
-- Runbook imagePullSecret: `docs/runbooks/ghcr-imagepullsecret.md`
+Este laboratório é construído em paralelo ao [`witness`](https://github.com/PydaVi/witness), um proxy reverso HTTP/1.1 em Go puro.
+Os dois projetos têm o mesmo DNA: aprendizado profundo, sem atalhos, com entendimento verificado a cada etapa.
