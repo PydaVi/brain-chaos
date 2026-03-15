@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab
+  namespace: argocd
+spec:
+  # Repos permitidos para este projeto (fonte de verdade).
+  sourceRepos:
+    - https://github.com/pydavi/brain-chaos.git
+
+  # Destinos permitidos para deploy (cluster local).
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "*"
+
+  # Permite recursos de cluster específicos (Namespace é cluster-scoped).
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace

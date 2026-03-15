@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lab-base
+  namespace: argocd
+spec:
+  project: lab
+
+  source:
+    repoURL: https://github.com/pydavi/brain-chaos.git
+    targetRevision: main
+    path: k8s/base
+
+  destination:
+    server: https://kubernetes.default.svc
+    # Namespace de destino é obrigatório no spec, mesmo para recursos cluster-scoped.
+    namespace: default
