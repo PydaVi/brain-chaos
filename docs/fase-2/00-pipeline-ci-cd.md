@@ -27,6 +27,16 @@ SBOM é a lista de dependências da imagem. Serve para auditoria e rastreio de C
 - Tradeoff: se o runner ou OIDC for comprometido, o atacante pode assinar.
 
 ## Limitações nesta fase
+
+## ArgoCD (CD/GitOps)
+- Observa o Git e reconcilia o estado do cluster com o estado declarado.
+- Usa AppProject para limitar permissões e Application para definir o que sincronizar.
+- Tradeoff: se o Git estiver errado, o ArgoCD aplica o erro automaticamente.
+
+## Decisão nesta fase
+- ArgoCD instalado via `k8s/argocd/` com Kustomize remoto do `install.yaml`.
+- O ArgoCD gerencia apenas `k8s/base/` por enquanto (namespaces).
+- O próprio ArgoCD ainda não se auto-gerencia.
 - Ainda não há validação de assinatura no cluster (isso entra na Fase 3 com Kyverno).
 - Não há aplicação real (fase 7).
 
