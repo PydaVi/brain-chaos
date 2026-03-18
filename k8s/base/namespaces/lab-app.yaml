@@ -5,3 +5,8 @@ metadata:
   labels:
     # Usado depois por policies/seletores para identificar workloads de app.
     purpose: app
+    # Enforce baseline: bloqueia pods perigosos (privileged/host*).
+    pod-security.kubernetes.io/enforce: baseline
+    # Audita e avisa no mesmo nível para visibilidade sem mudar o enforcement.
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
