@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lab-app-default-deny
+  namespace: lab-app
+spec:
+  # Seleciona todos os pods do namespace.
+  podSelector: {}
+  # Define que este namespace terá políticas de entrada e saída.
+  policyTypes:
+    - Ingress
+    - Egress
+  # Sem regras explícitas: tudo bloqueado por padrão.
+  ingress: []
+  egress: []
