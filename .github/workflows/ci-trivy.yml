@@ -33,6 +33,13 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
+      - name: Setup Trivy
+        uses: aquasecurity/setup-trivy@v0.2.0
+        with:
+          version: v0.68.1
+          cache: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Trivy scan (fail on HIGH+)
         uses: aquasecurity/trivy-action@v0.33.1
         with:
@@ -41,6 +48,7 @@ jobs:
           exit-code: "1"
           severity: "HIGH,CRITICAL"
           vuln-type: "os,library"
+          skip-setup-trivy: true
 
       - name: Generate SBOM (CycloneDX)
         uses: aquasecurity/trivy-action@v0.33.1
@@ -48,6 +56,7 @@ jobs:
           image-ref: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           format: cyclonedx
           output: trivy-sbom.cdx.json
+          skip-setup-trivy: true
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
