@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-capabilities
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: restrict-capabilities
+      match:
+        resources:
+          namespaces:
+            - lab-app
+      validate:
+        message: "Capacidades devem ser mínimas (drop ALL)."
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  capabilities:
+                    # Força drop total. Depois liberamos add mínimas se necessário.
+                    drop:
+                      - "ALL"
+            initContainers:
+              - securityContext:
+                  capabilities:
+                    drop:
+                      - "ALL"

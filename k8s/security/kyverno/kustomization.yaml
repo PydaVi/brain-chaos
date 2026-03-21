@@ -1,0 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: lab-security
+resources:
+  # Manifesto oficial da release tag (estável).
+  - https://github.com/kyverno/kyverno/releases/download/v1.16.2/install.yaml

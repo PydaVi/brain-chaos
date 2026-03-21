@@ -1,0 +1,23 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: disallow-privileged
+      match:
+        resources:
+          namespaces:
+            - lab-app
+      validate:
+        message: "Privileged containers não são permitidos."
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  privileged: false
+            initContainers:
+              - securityContext:
+                  privileged: false
