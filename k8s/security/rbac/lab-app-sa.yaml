@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lab-app-sa
+  namespace: lab-app
+  labels:
+    # Identifica o SA usado pela aplicação do lab.
+    purpose: app

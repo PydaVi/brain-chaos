@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: lab-app-viewer-binding
+  namespace: lab-app
+subjects:
+  - kind: ServiceAccount
+    name: lab-app-sa
+    namespace: lab-app
+roleRef:
+  # Liga o SA ao Role local (least privilege).
+  kind: Role
+  name: lab-app-viewer
+  apiGroup: rbac.authorization.k8s.io
