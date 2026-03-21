@@ -33,30 +33,26 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-      - name: Setup Trivy
-        uses: aquasecurity/setup-trivy@e07451d2e059ed86c2870430ea286b3a9e0bf241
-        with:
-          version: v0.68.1
-          cache: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Trivy scan (fail on HIGH+)
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          format: table
-          exit-code: "1"
-          severity: "HIGH,CRITICAL"
-          vuln-type: "os,library"
-          skip-setup-trivy: true
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.68.1 \
+            image --format table --exit-code 1 \
+            --severity HIGH,CRITICAL \
+            --vuln-type os,library \
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Generate SBOM (CycloneDX)
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1
-        with:
-          image-ref: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          format: cyclonedx
-          output: trivy-sbom.cdx.json
-          skip-setup-trivy: true
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}:/work \
+            -w /work \
+            aquasec/trivy:0.68.1 \
+            image --format cyclonedx \
+            -o trivy-sbom.cdx.json \
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
