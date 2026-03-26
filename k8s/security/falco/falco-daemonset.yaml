@@ -21,6 +21,10 @@ spec:
         - name: falco
           image: falcosecurity/falco:0.38.2
           imagePullPolicy: IfNotPresent
+          env:
+            # Indica ao Falco onde está o rootfs do host para mapear paths.
+            - name: HOST_ROOT
+              value: /host
           securityContext:
             # Necessário para acessar hooks de kernel / eBPF.
             privileged: true
@@ -43,6 +47,21 @@ spec:
             # Código-fonte do kernel, necessário em alguns modos.
             - name: usr-src
               mountPath: /usr/src
+            # Acesso ao tracefs do host (eventos eBPF).
+            - name: trace-fs
+              mountPath: /sys/kernel/tracing
+              readOnly: true
+            # Acesso aos BTFs do kernel (modern eBPF).
+            - name: btf
+              mountPath: /sys/kernel/btf
+              readOnly: true
+            # Rootfs do host para resolver caminhos absolutos.
+            - name: host-proc
+              mountPath: /host/proc
+              readOnly: true
+            - name: host-etc
+              mountPath: /host/etc
+              readOnly: true
             # Configuração e regras.
             - name: falco-rules-local
               mountPath: /etc/falco/falco_rules.local.yaml
@@ -60,6 +79,18 @@ spec:
         - name: usr-src
           hostPath:
             path: /usr/src
+        - name: trace-fs
+          hostPath:
+            path: /sys/kernel/tracing
+        - name: btf
+          hostPath:
+            path: /sys/kernel/btf
+        - name: host-proc
+          hostPath:
+            path: /proc
+        - name: host-etc
+          hostPath:
+            path: /etc
         - name: falco-rules-local
           configMap:
             name: falco-rules-local
