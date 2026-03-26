@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: falco
+  namespace: lab-security
+  labels:
+    app.kubernetes.io/name: falco

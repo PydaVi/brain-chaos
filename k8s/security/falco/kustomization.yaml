@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: lab-security
+resources:
+  # ServiceAccount dedicado para o Falco (least privilege).
+  - falco-sa.yaml
+  # RBAC para metadata K8s (enriquecimento de eventos).
+  - falco-rbac.yaml
+  # Regras customizadas do lab.
+  - falco-rules-local.yaml
+  # DaemonSet: Falco precisa rodar em cada nó.
+  - falco-daemonset.yaml

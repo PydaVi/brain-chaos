@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: falco-k8smeta
+  labels:
+    app.kubernetes.io/name: falco
+rules:
+  # Leitura de objetos para enriquecer eventos (sem write).
+  - apiGroups: [""]
+    resources: ["pods", "namespaces", "nodes"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: falco-k8smeta
+  labels:
+    app.kubernetes.io/name: falco
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: falco-k8smeta
+subjects:
+  - kind: ServiceAccount
+    name: falco
+    namespace: lab-security

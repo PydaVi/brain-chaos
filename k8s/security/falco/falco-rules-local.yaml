@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-rules-local
+  namespace: lab-security
+  labels:
+    app.kubernetes.io/name: falco
+data:
+  falco_rules.local.yaml: |
+    # Regras customizadas do lab (foco em lab-app).
+
+    - rule: Shell spawned in lab-app
+      desc: Detecta shell interativa aberta dentro de containers no namespace lab-app.
+      condition: evt.type in (execve, execveat) and container and k8s.ns.name=lab-app and proc.name in (bash, sh, zsh, ksh)
+      output: Shell em container (user=%user.name command=%proc.cmdline pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, shell, lab-app]
+
+    - rule: Sensitive file read in lab-app
+      desc: Detecta leitura de arquivos sensíveis dentro de containers no namespace lab-app.
+      condition: evt.type in (open, openat) and container and k8s.ns.name=lab-app and fd.name in (/etc/shadow, /etc/passwd)
+      output: Leitura de arquivo sensível (file=%fd.name user=%user.name pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, filesystem, lab-app]
+
+    - rule: Network tool executed in lab-app
+      desc: Detecta execução de ferramentas de rede em containers no namespace lab-app.
+      condition: evt.type in (execve, execveat) and container and k8s.ns.name=lab-app and proc.name in (curl, wget, nc, ncat, netcat)
+      output: Ferramenta de rede executada (cmd=%proc.cmdline user=%user.name pod=%k8s.pod.name ns=%k8s.ns.name)
+      priority: NOTICE
+      tags: [container, network, lab-app]

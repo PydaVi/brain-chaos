@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: falco
+  namespace: lab-security
+  labels:
+    app.kubernetes.io/name: falco
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: falco
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: falco
+    spec:
+      serviceAccountName: falco
+      # Falco precisa ver processos do host (syscalls) no nó.
+      hostPID: true
+      containers:
+        - name: falco
+          image: falcosecurity/falco:0.38.2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            # Necessário para acessar hooks de kernel / eBPF.
+            privileged: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+          volumeMounts:
+            # Acesso aos dispositivos e interfaces do kernel.
+            - name: dev-fs
+              mountPath: /dev
+            # Acesso às informações de processos do host.
+            - name: proc-fs
+              mountPath: /proc
+            # Acesso aos módulos do kernel (driver/eBPF).
+            - name: modules
+              mountPath: /lib/modules
+            # Código-fonte do kernel, necessário em alguns modos.
+            - name: usr-src
+              mountPath: /usr/src
+            # Configuração e regras.
+            - name: falco-rules-local
+              mountPath: /etc/falco/falco_rules.local.yaml
+              subPath: falco_rules.local.yaml
+      volumes:
+        - name: dev-fs
+          hostPath:
+            path: /dev
+        - name: proc-fs
+          hostPath:
+            path: /proc
+        - name: modules
+          hostPath:
+            path: /lib/modules
+        - name: usr-src
+          hostPath:
+            path: /usr/src
+        - name: falco-rules-local
+          configMap:
+            name: falco-rules-local
